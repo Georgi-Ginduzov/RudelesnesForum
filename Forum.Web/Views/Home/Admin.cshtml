@@ -1,0 +1,158 @@
+﻿@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container-fluid">
+    <!-- Dashboard Header -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="display-4 text-primary mb-2">
+                <i class="fas fa-tachometer-alt me-3"></i>Admin Dashboard
+            </h1>
+            <p class="lead text-muted">Manage your forum efficiently</p>
+        </div>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-6 col-xl-3">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-danger bg-gradient rounded-3 p-3 me-3">
+                            <i class="fas fa-shield-alt text-white fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-0">Moderation Panel</h5>
+                        </div>
+                    </div>
+                    <p class="card-text text-muted mb-3">
+                        Review reported posts, manage flags, and moderate content
+                    </p>
+                    <a href="/Moderation" class="btn btn-outline-danger btn-sm">
+                        Access Panel <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-xl-3">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-info bg-gradient rounded-3 p-3 me-3">
+                            <i class="fas fa-users text-white fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-0">Manage Users</h5>
+                        </div>
+                    </div>
+                    <p class="card-text text-muted mb-3">
+                        View user accounts, manage permissions, and handle user issues
+                    </p>
+                    <a href="/Admin/Users" class="btn btn-outline-info btn-sm">
+                        Manage Users <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-xl-3">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-success bg-gradient rounded-3 p-3 me-3">
+                            <i class="fas fa-chart-bar text-white fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-0">Analytics</h5>
+                        </div>
+                    </div>
+                    <p class="card-text text-muted mb-3">
+                        View forum statistics, user activity, and performance metrics
+                    </p>
+                    <a href="/Admin/Analytics" class="btn btn-outline-success btn-sm">
+                        View Analytics <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-xl-3">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-warning bg-gradient rounded-3 p-3 me-3">
+                            <i class="fas fa-cog text-white fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-0">Forum Settings</h5>
+                        </div>
+                    </div>
+                    <p class="card-text text-muted mb-3">
+                        Configure forum settings, categories, and general preferences
+                    </p>
+                    <a href="/Admin/Settings" class="btn btn-outline-warning btn-sm">
+                        Configure <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0 pb-0">
+                    <h2 class="h4 text-center text-dark mb-0">Quick Overview</h2>
+                </div>
+                <div class="card-body pt-4">
+                    <div class="row g-4">
+                        <div class="col-6 col-md-3">
+                            <div class="text-center p-3 bg-light rounded-3">
+                                <div class="display-6 fw-bold text-primary mb-2">
+                                    @Model.TotalUsers.ToString("N0")
+                                </div>
+                                <div class="text-muted small text-uppercase fw-semibold">
+                                    Total Users
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="text-center p-3 bg-light rounded-3">
+                                <div class="display-6 fw-bold text-success mb-2">
+                                    @Model.TotalPosts.ToString("N0")
+                                </div>
+                                <div class="text-muted small text-uppercase fw-semibold">
+                                    Total Posts
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="text-center p-3 bg-light rounded-3">
+                                <div class="display-6 fw-bold text-warning mb-2">
+                                    @Model.PendingReports.ToString("N0")
+                                </div>
+                                <div class="text-muted small text-uppercase fw-semibold">
+                                    Pending Reports
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="text-center p-3 bg-light rounded-3">
+                                <div class="display-6 fw-bold text-info mb-2">
+                                    @Model.ActiveUsers.ToString("N0")
+                                </div>
+                                <div class="text-muted small text-uppercase fw-semibold">
+                                    Active Today
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

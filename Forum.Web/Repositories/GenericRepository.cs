@@ -6,8 +6,8 @@ namespace Forum.Web.Repositories
 {
     public class GenericRepository<T> : IRepository<T> where T : class
     {
-        protected readonly ForumDbContext db;
-        public GenericRepository(ForumDbContext db) => this.db = db;
+        protected readonly ApplicationDbContext db;
+        public GenericRepository(ApplicationDbContext db) => this.db = db;
 
         public IQueryable<T> Entities => db.Set<T>().AsNoTracking();
 

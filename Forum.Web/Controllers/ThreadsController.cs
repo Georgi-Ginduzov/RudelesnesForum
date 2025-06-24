@@ -67,7 +67,7 @@ namespace Forum.Web.Controllers
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var postId = await posts.AddAsync(userId, id, dto);
             return CreatedAtAction(
-                actionName: nameof(PostsController.GetForThread),
+                actionName: nameof(PostsController.Index),
                 controllerName: "Posts",
                 routeValues: new { threadId = id },
                 value: null);

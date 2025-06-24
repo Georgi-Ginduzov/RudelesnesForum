@@ -1,4 +1,6 @@
-﻿namespace Forum.Web.Services.Contracts
+﻿using Forum.Web.Dtos.Flag;
+
+namespace Forum.Web.Services.Contracts
 {
     public interface IFlagService
     {

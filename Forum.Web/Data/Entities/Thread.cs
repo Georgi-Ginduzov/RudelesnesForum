@@ -10,7 +10,7 @@ namespace Forum.Web.Data.Entities
 
         [ForeignKey(nameof(Creator))]
         public int CreatorId { get; set; }
-        public User Creator { get; set; }
+        public ApplicationUser Creator { get; set; }
 
         [Required, MaxLength(255)]
         public string Topic { get; set; }

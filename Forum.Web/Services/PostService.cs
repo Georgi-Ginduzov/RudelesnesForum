@@ -9,48 +9,41 @@ namespace Forum.Web.Services
 {
     public class PostService : IPostService
     {
-        private readonly ForumDbContext db;
-        public PostService(ForumDbContext db) => this.db = db;
+        private readonly ApplicationDbContext db;
+        public PostService(ApplicationDbContext db) => this.db = db;
 
         public async Task<(IEnumerable<PostDto>, string?)> GetForThreadAsync(long threadId, int limit, DateTime? before)
         {
-            var cutoff = before ?? DateTime.UtcNow;
-            var q = from p in db.Posts
-                    where p.ThreadId == threadId
-                       && p.Status == PostStatus.Approved
-                       && p.CreatedAt < cutoff
-                    orderby p.CreatedAt descending
-                    select new PostDto
-                    {
-                        PostId = p.PostId,
-                        Content = p.Content,
-                        Creator = p.Creator.NickName,
-                        CreatedAt = p.CreatedAt
-                    };
+            //var cutoff = before ?? DateTime.UtcNow;
+            //var q = from p in db.Posts
+            //        where p.ThreadId == threadId
+            //           && p.Status == PostStatus.Approved
+            //           && p.CreatedAt < cutoff
+            //        orderby p.CreatedAt descending
+            //        select new PostDto
+            //        {
+            //            PostId = p.PostId,
+            //            Content = p.Content,
+            //            Creator = p.Creator.NickName,
+            //            CreatedAt = p.CreatedAt
+            //        };
 
-            var page = await q.Take(limit + 1).ToListAsync();
-            var hasMore = page.Count == limit + 1;
-            if (hasMore) page.RemoveAt(limit);
+            //var page = await q.Take(limit + 1).ToListAsync();
+            //var hasMore = page.Count == limit + 1;
+            //if (hasMore) page.RemoveAt(limit);
 
-            var nextCursor = hasMore
-                ? page.Last().CreatedAt.ToString("o")
-                : null;
+            //var nextCursor = hasMore
+            //    ? page.Last().CreatedAt.ToString("o")
+            //    : null;
 
-            return (page, nextCursor);
+            return (null, "");
         }
 
         public async Task<long> AddAsync(int creatorId, long threadId, CreatePostDto dto)
         {
-            var post = new Post
-            {
-                ThreadId = threadId,
-                ParentId = dto.ParentId,
-                Content = dto.Content,
-                CreatorId = creatorId,
-                CreatedAt = DateTime.UtcNow,
-                LastUpdated = DateTime.UtcNow,
-                Status = PostStatus.Pending
-            };
+            //TODO: Map DTO to post
+            var post = new Post();
+           
             db.Posts.Add(post);
             await db.SaveChangesAsync();
             return post.PostId;

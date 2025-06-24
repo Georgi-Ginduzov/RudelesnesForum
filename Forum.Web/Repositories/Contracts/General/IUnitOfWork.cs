@@ -4,8 +4,8 @@ namespace Forum.Web.Repositories.Contracts.Base
     public interface IUnitOfWork : IDisposable
     {
         IPostRepository PostRepository { get; }
-        IRudenessReviewRepository RudenessReviewRepository { get; }
-        IRudenessScanRepository RudenessScanRepository { get; }
+        //IRudenessReviewRepository RudenessReviewRepository { get; }
+        //IRudenessScanRepository RudenessScanRepository { get; }
         IThreadRepository ThreadRepository { get; }
         IUserRepository UserRepository { get; }
 

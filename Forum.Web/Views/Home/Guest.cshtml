@@ -1,0 +1,243 @@
+﻿@model GuestHomeViewModel
+@{
+    ViewData["Title"] = "Welcome";
+}
+
+<div class="container-fluid">
+    <!-- Welcome Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="bg-primary bg-gradient text-white rounded-3 p-5 text-center">
+                <div class="mb-4">
+                    <i class="fas fa-users" style="font-size: 4rem; opacity: 0.8;"></i>
+                </div>
+                <h1 class="display-4 mb-3">Welcome to @Model.ForumName!</h1>
+                <p class="lead mb-4">@Model.ForumDescription</p>
+                <div class="d-flex gap-3 justify-content-center flex-wrap">
+                    <a href="/Identity/Account/Login" class="btn btn-light btn-lg px-4">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </a>
+                    <a href="/Identity/Account/Register" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fas fa-user-plus me-2"></i>Register
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Community Stats -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card text-center border-0 shadow-sm">
+                <div class="card-body py-4">
+                    <div class="text-primary mb-2">
+                        <i class="fas fa-comments" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h3 class="text-primary mb-1">@Model.TotalPosts.ToString("N0")</h3>
+                    <p class="text-muted mb-0">Discussions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center border-0 shadow-sm">
+                <div class="card-body py-4">
+                    <div class="text-success mb-2">
+                        <i class="fas fa-users" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h3 class="text-success mb-1">@Model.TotalMembers.ToString("N0")</h3>
+                    <p class="text-muted mb-0">Community Members</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center border-0 shadow-sm">
+                <div class="card-body py-4">
+                    <div class="text-info mb-2">
+                        <i class="fas fa-circle text-success" style="font-size: 1rem;"></i>
+                        <i class="fas fa-user" style="font-size: 2rem;"></i>
+                    </div>
+                    <h3 class="text-info mb-1">@Model.OnlineUsers.ToString("N0")</h3>
+                    <p class="text-muted mb-0">Online Now</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Recent Discussions Preview -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                    <h3 class="h5 mb-0">
+                        <i class="fas fa-fire text-danger me-2"></i>Recent Discussions
+                    </h3>
+                    <span class="badge bg-light text-dark">Preview</span>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.RecentDiscussions.Any())
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var discussion in Model.RecentDiscussions.Take(5))
+                            {
+                                <div class="list-group-item border-0 py-3">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <div class="d-flex align-items-start">
+                                                <div class="me-3">
+                                                    @if (discussion.IsPinned)
+                                                    {
+                                                        <i class="fas fa-thumbtack text-warning"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="fas fa-comment text-primary"></i>
+                                                    }
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-1 text-dark">@discussion.Title</h6>
+                                                    <small class="text-muted">
+                                                        by <strong>@discussion.AuthorName</strong>
+                                                        in <span class="badge bg-secondary">@discussion.Category</span>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 text-center d-none d-md-block">
+                                            <div class="text-primary fw-bold">@discussion.ReplyCount</div>
+                                            <small class="text-muted">replies</small>
+                                        </div>
+                                        <div class="col-md-2 text-md-end">
+                                            <small class="text-muted">
+                                                @discussion.CreatedAt.ToString("MMM dd")
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-comments text-muted" style="font-size: 2rem;"></i>
+                            <p class="text-muted mt-2 mb-0">No discussions yet</p>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer bg-light border-0 text-center">
+                    <div class="text-muted mb-2">
+                        <i class="fas fa-lock me-1"></i>
+                        Login to view full discussions and participate
+                    </div>
+                    <a href="/Identity/Account/Login" class="btn btn-primary btn-sm">
+                        Login to Continue
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories & Join CTA -->
+        <div class="col-lg-4">
+            <!-- Join Community Card -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-heart text-danger" style="font-size: 2rem;"></i>
+                    </div>
+                    <h5 class="card-title">Join Our Community</h5>
+                    <p class="card-text text-muted small mb-3">
+                        Create an account to start discussions, reply to posts, and connect with other members.
+                    </p>
+                    <a href="/Identity/Account/Register" class="btn btn-success w-100 mb-2">
+                        <i class="fas fa-user-plus me-2"></i>Sign Up Free
+                    </a>
+                    <a href="/Identity/Account/Login" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-sign-in-alt me-2"></i>Already a Member?
+                    </a>
+                </div>
+            </div>
+
+            <!-- Categories Preview -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tags text-info me-2"></i>Forum Categories
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Categories.Any())
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var category in Model.Categories.Take(6))
+                            {
+                                <div class="list-group-item border-0 py-2">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <i class="@category.IconClass text-muted"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="fw-semibold">@category.Name</div>
+                                            <small class="text-muted">@category.Description</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <small class="text-muted">@category.PostCount posts</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-3">
+                            <small class="text-muted">Categories coming soon</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0 text-center">
+                    <h4 class="mb-0">Why Join Our Community?</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4 text-center">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <i class="fas fa-comments text-primary" style="font-size: 2rem;"></i>
+                            </div>
+                            <h6>Engage in Discussions</h6>
+                            <small class="text-muted">Share your thoughts and learn from others</small>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <i class="fas fa-users text-success" style="font-size: 2rem;"></i>
+                            </div>
+                            <h6>Connect with People</h6>
+                            <small class="text-muted">Build relationships with like-minded individuals</small>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <i class="fas fa-lightbulb text-warning" style="font-size: 2rem;"></i>
+                            </div>
+                            <h6>Share Knowledge</h6>
+                            <small class="text-muted">Help others and expand your expertise</small>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <i class="fas fa-shield-alt text-info" style="font-size: 2rem;"></i>
+                            </div>
+                            <h6>Safe Environment</h6>
+                            <small class="text-muted">Moderated community with clear guidelines</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

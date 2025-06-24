@@ -8,7 +8,7 @@ namespace Forum.Web.Repositories.Implementations
     public class PostRepository
         : GenericRepository<Post>, IPostRepository
     {
-        public PostRepository(ForumDbContext db)
+        public PostRepository(ApplicationDbContext db)
             : base(db) { }
 
 

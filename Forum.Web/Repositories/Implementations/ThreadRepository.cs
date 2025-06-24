@@ -6,7 +6,7 @@ namespace Forum.Web.Repositories.Implementations
 {
     public class ThreadRepository : GenericRepository<Data.Entities.Thread>, IThreadRepository
     {
-        public ThreadRepository(ForumDbContext db)
+        public ThreadRepository(ApplicationDbContext db)
             : base(db) 
         { 
         
