@@ -1,10 +1,12 @@
 using Forum.Web.Data;
+using Forum.Web.Data.Entities;
 using Forum.Web.Repositories.Contracts;
-using Microsoft.EntityFrameworkCore;
 using Forum.Web.Repositories.Contracts.Base;
-using Forum.Web.Services.Contracts;
-using Forum.Web.Services;
 using Forum.Web.Repositories.Implementations;
+using Forum.Web.Services;
+using Forum.Web.Services.Contracts;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Web
 {
@@ -27,7 +29,14 @@ namespace Forum.Web
             builder.Services
                 .AddScoped<IPostService, PostService>();
 
-            builder.Services.AddControllers();
+            builder.Services
+                .AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders()
+                .AddDefaultUI();
+
+            builder.Services.AddControllersWithViews();
+            builder.Services.AddRazorPages();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -41,11 +50,19 @@ namespace Forum.Web
             }
 
             app.UseHttpsRedirection();
+            app.UseRouting();
 
             app.UseAuthorization();
+            app.MapStaticAssets();
 
 
-            app.MapControllers();
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}")
+                .WithStaticAssets();
+
+            app.MapRazorPages()
+               .WithStaticAssets();
 
             app.Run();
         }
