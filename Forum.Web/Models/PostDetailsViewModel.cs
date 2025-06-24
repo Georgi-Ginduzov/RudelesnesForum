@@ -10,47 +10,39 @@
         public bool CanDelete { get; set; } = false;
         public bool CanModerate { get; set; } = false;
         public string CurrentUserId { get; set; } = "";
-        public bool IsLoggedIn { get; set; } = false;
-        public List<PostDetail> RelatedPosts { get; set; } = new List<PostDetail>();
     }
 
     public class PostDetail
     {
-        public int Id { get; set; }
+        public int PostId { get; set; }
         public string Title { get; set; } = "";
         public string Content { get; set; } = "";
+        public string UserId { get; set; } = "";
         public string AuthorName { get; set; } = "";
-        public string AuthorId { get; set; } = "";
-        public string AuthorAvatar { get; set; } = "";
-        public string AuthorRole { get; set; } = "Member";
+        public string AuthorEmail { get; set; } = "";
         public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-        public int ViewCount { get; set; }
+        public DateTime LastUpdated { get; set; }
         public int ReplyCount { get; set; }
-        public string CategoryName { get; set; } = "";
-        public int CategoryId { get; set; }
-        public string CategoryColor { get; set; } = "secondary";
-        public bool IsPinned { get; set; }
-        public bool IsLocked { get; set; }
-        public List<string> Tags { get; set; } = new List<string>();
-        public int LikeCount { get; set; }
-        public bool IsLikedByCurrentUser { get; set; }
     }
 
     public class PostReply
     {
-        public int Id { get; set; }
+        public int ReplyId { get; set; }
         public string Content { get; set; } = "";
+        public string UserId { get; set; } = "";
         public string AuthorName { get; set; } = "";
-        public string AuthorId { get; set; } = "";
-        public string AuthorAvatar { get; set; } = "";
-        public string AuthorRole { get; set; } = "Member";
+        public string AuthorEmail { get; set; } = "";
         public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-        public int LikeCount { get; set; }
-        public bool IsLikedByCurrentUser { get; set; }
-        public bool IsAuthor { get; set; }
-        public int? ParentReplyId { get; set; }
-        public string ParentAuthorName { get; set; } = "";
+        public DateTime LastUpdated { get; set; }
+    }
+
+    public class PaginationInfo
+    {
+        public int CurrentPage { get; set; } = 1;
+        public int TotalPages { get; set; }
+        public int PageSize { get; set; } = 10;
+        public int TotalItems { get; set; }
+        public bool HasPrevious => CurrentPage > 1;
+        public bool HasNext => CurrentPage < TotalPages;
     }
 }
