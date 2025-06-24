@@ -3,7 +3,7 @@ using Forum.Web.Repositories.Contracts.Base;
 
 namespace Forum.Web.Repositories.Contracts
 {
-    public interface IUserRepository : IRepository<User>
+    public interface IUserRepository : IRepository<ApplicationUser>
     {
 
     }

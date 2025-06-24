@@ -3,7 +3,7 @@ using Forum.Web.Repositories.Contracts.Base;
 
 namespace Forum.Web.Repositories.Contracts
 {
-    public interface IRudenessScanRepository : IRepository<RudenessScan>
-    {
-    }
+    //public interface IRudenessScanRepository : IRepository<RudenessScan>
+    //{
+    //}
 }

@@ -6,22 +6,22 @@ namespace Forum.Web.Repositories.Implementations
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly ForumDbContext db;
+        private readonly ApplicationDbContext db;
 
-        public UnitOfWork(ForumDbContext db, IPostRepository postRepository, IRudenessReviewRepository rudenessReviewRepository, IRudenessScanRepository rudenessScanRepository, IThreadRepository threadRepository, IUserRepository userRepository)
+        public UnitOfWork(ApplicationDbContext db, IPostRepository postRepository, IThreadRepository threadRepository, IUserRepository userRepository)
         {
             this.db = db;
 
             PostRepository = postRepository;
-            RudenessReviewRepository = rudenessReviewRepository;
-            RudenessScanRepository = rudenessScanRepository;
+            //RudenessReviewRepository = rudenessReviewRepository;
+            //RudenessScanRepository = rudenessScanRepository;
             ThreadRepository = threadRepository;
             UserRepository = userRepository;
         }
 
         public IPostRepository PostRepository { get; }
-        public IRudenessReviewRepository RudenessReviewRepository { get; }
-        public IRudenessScanRepository RudenessScanRepository{ get; }
+        //public IRudenessReviewRepository RudenessReviewRepository { get; }
+        //public IRudenessScanRepository RudenessScanRepository{ get; }
         public IThreadRepository ThreadRepository { get; }
         public IUserRepository UserRepository { get; }
 

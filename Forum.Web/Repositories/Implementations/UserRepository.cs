@@ -4,9 +4,9 @@ using Forum.Web.Repositories.Contracts;
 
 namespace Forum.Web.Repositories.Implementations
 {
-    public class UserRepository : GenericRepository<User>, IUserRepository
+    public class UserRepository : GenericRepository<ApplicationUser>, IUserRepository
     {
-        public UserRepository(ForumDbContext db)
+        public UserRepository(ApplicationDbContext db)
             : base(db) { }
     }
 }

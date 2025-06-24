@@ -4,9 +4,9 @@ using Forum.Web.Repositories.Contracts;
 
 namespace Forum.Web.Repositories.Implementations
 {
-    public class RudenessReviewRepository : GenericRepository<RudenessReview>, IRudenessReviewRepository
-    {
-        public RudenessReviewRepository(ForumDbContext db)
-            : base(db) { }
-    }
+    //public class RudenessReviewRepository : GenericRepository<RudenessReview>, IRudenessReviewRepository
+    //{
+    //    public RudenessReviewRepository(ApplicationDbContext db)
+    //        : base(db) { }
+    //}
 }

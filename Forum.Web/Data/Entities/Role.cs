@@ -12,6 +12,6 @@ namespace Forum.Web.Data.Entities
 
         public string Description { get; set; }
 
-        public ICollection<User> Users { get; set; }
+        public ICollection<ApplicationUser> Users { get; set; }
     }
 }
