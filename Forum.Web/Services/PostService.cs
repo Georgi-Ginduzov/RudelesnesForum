@@ -39,14 +39,20 @@ namespace Forum.Web.Services
             return (null, "");
         }
 
-        public async Task<long> AddAsync(int creatorId, long threadId, CreatePostDto dto)
+        public async Task<int> CreateAsync(string creatorId, string title, string content)
         {
-            //TODO: Map DTO to post
-            var post = new Post();
+            var post = new Post()
+            {
+                Title = title,
+                Content = content,
+                UserId = creatorId,
+                CreatedAt = DateTime.UtcNow,
+                LastUpdated = DateTime.UtcNow,
+            };
            
-            db.Posts.Add(post);
+            var postResult = await db.Posts.AddAsync(post);
             await db.SaveChangesAsync();
-            return post.PostId;
+            return postResult.Entity.PostId;
         }
     }
 }

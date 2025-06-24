@@ -7,9 +7,6 @@ namespace Forum.Web.Services.Contracts
     {
         Task<(IEnumerable<PostDto> Posts, string? NextCursor)>
         GetForThreadAsync(long threadId, int limit, DateTime? before);
-
-        Task<long>
-            AddAsync(int creatorId, long threadId, CreatePostDto dto);
-
+        Task<int> CreateAsync(string creatorId, string title, string content);
     }
 }

@@ -1,10 +1,24 @@
-﻿using Forum.Web.Models;
+﻿using Forum.Web.Data.Entities;
+using Forum.Web.Models;
+using Forum.Web.Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.Web.Controllers
 {
+    [Authorize]
     public class PostsController : Controller
     {
+        private readonly IPostService _postService;
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public PostsController(IPostService postService, UserManager<ApplicationUser> userManager)
+        {
+            _postService = postService;
+            _userManager = userManager;
+        }
+
         public async Task<IActionResult> Index(
                     string search = "",
                     int? categoryId = null,
@@ -243,6 +257,22 @@ namespace Forum.Web.Controllers
                 }
             };
             return View("Details", postDetailsModel);
+        }
+
+        public async Task<IActionResult> Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(CreatePostViewModel post)
+        {
+            if (!ModelState.IsValid)
+                return View(post);
+
+            var user = await _userManager.GetUserAsync(User);
+            var postId = await _postService.CreateAsync(user.Id, post.Title, post.Content);
+            return RedirectToAction(nameof(Details), postId);
         }
     }
 }

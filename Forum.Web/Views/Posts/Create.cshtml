@@ -1,0 +1,220 @@
+﻿@model CreatePostViewModel
+@{
+    ViewData["Title"] = "Create New Post";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-6 mb-2">
+                        <i class="fas fa-plus-circle text-primary me-2"></i>Create New Post
+                    </h1>
+                    <p class="text-muted mb-0">Share your thoughts with the community</p>
+                </div>
+                <a href="/Posts" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Posts
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Post Form -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>Post Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-action="Create" novalidate>
+                        <!-- Title -->
+                        <div class="mb-4">
+                            <label asp-for="Title" class="form-label fw-semibold">
+                                Post Title <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Title" class="form-control form-control-lg"
+                                   placeholder="Enter a descriptive title for your post..."
+                                   maxlength="200">
+                            <div class="form-text">
+                                <span id="title-counter">0</span>/200 characters
+                            </div>
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="mb-4">
+                            <label asp-for="Content" class="form-label fw-semibold">
+                                Post Content <span class="text-danger">*</span>
+                            </label>
+                            <textarea asp-for="Content" class="form-control" rows="12"
+                                      placeholder="Write your post content here... You can use basic formatting and include links."
+                                      maxlength="10000"></textarea>
+                            <div class="form-text">
+                                <span id="content-counter">0</span>/10,000 characters
+                            </div>
+                            <span asp-validation-for="Content" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex gap-3 pt-3 border-top">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Create Post
+                            </button>
+                            <a href="/Posts" class="btn btn-outline-danger btn-lg">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Posting Guidelines -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Posting Guidelines
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <small>Use a clear, descriptive title</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <small>Be respectful and constructive</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <small>Search for existing posts first</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <small>Use proper formatting and grammar</small>
+                        </li>
+                        <li class="mb-0">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <small>Stay on topic and be helpful</small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Formatting Help -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-question-circle me-2"></i>Formatting Help
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="small">
+                        <div class="mb-2">
+                            <strong>Bold text:</strong> **bold text**
+                        </div>
+                        <div class="mb-2">
+                            <strong>Italic text:</strong> *italic text*
+                        </div>
+                        <div class="mb-2">
+                            <strong>Links:</strong> [link text](URL)
+                        </div>
+                        <div class="mb-2">
+                            <strong>Code:</strong> `code text`
+                        </div>
+                        <div class="mb-0">
+                            <strong>Lists:</strong> Use - or * for bullets
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for form interactions -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Character counters
+        const titleInput = document.getElementById('Title');
+        const contentTextarea = document.getElementById('Content');
+        const titleCounter = document.getElementById('title-counter');
+        const contentCounter = document.getElementById('content-counter');
+
+        function updateTitleCounter() {
+            const count = titleInput.value.length;
+            titleCounter.textContent = count;
+            titleCounter.className = count > 180 ? 'text-warning' : count > 200 ? 'text-danger' : '';
+        }
+
+        function updateContentCounter() {
+            const count = contentTextarea.value.length;
+            contentCounter.textContent = count;
+            contentCounter.className = count > 9000 ? 'text-warning' : count > 10000 ? 'text-danger' : '';
+        }
+
+        titleInput.addEventListener('input', updateTitleCounter);
+        contentTextarea.addEventListener('input', updateContentCounter);
+
+        // Initialize counters
+        updateTitleCounter();
+        updateContentCounter();
+    });
+
+    function saveDraft(silent = false) {
+        const formData = {
+            title: document.getElementById('Title').value,
+            content: document.getElementById('Content').value
+        };
+
+        // Save to localStorage as backup
+        localStorage.setItem('postDraft', JSON.stringify(formData));
+
+        if (!silent) {
+            // Show user feedback
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check me-2"></i>Draft Saved';
+            button.classList.remove('btn-outline-secondary');
+            button.classList.add('btn-success');
+
+            setTimeout(function() {
+                button.innerHTML = originalText;
+                button.classList.remove('btn-success');
+                button.classList.add('btn-outline-secondary');
+            }, 2000);
+        }
+    }
+
+    // Load draft on page load
+    window.addEventListener('load', function() {
+        const savedDraft = localStorage.getItem('postDraft');
+        if (savedDraft && confirm('You have a saved draft. Would you like to restore it?')) {
+            const draft = JSON.parse(savedDraft);
+            document.getElementById('Title').value = draft.title || '';
+            document.getElementById('Content').value = draft.content || '';
+
+            // Update character counters
+            document.getElementById('Title').dispatchEvent(new Event('input'));
+            document.getElementById('Content').dispatchEvent(new Event('input'));
+        }
+    });
+
+    // Clear draft on successful submission
+    document.querySelector('form').addEventListener('submit', function() {
+        localStorage.removeItem('postDraft');
+    });
+</script>
+
+<!-- Include validation scripts -->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
