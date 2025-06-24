@@ -10,9 +10,34 @@ namespace Forum.Web.Services
         private readonly ApplicationDbContext db;
         public PostService(ApplicationDbContext db) => this.db = db;
 
+        public async Task<IEnumerable<Post>> GetAllPostsAsync(string search = "", int skip = 0, int take = 0)
+        {
+            var postsCount = await db.Posts.CountAsync();
+            var allPosts = await db.Posts
+                .Include(x => x.User)
+                .Include(x => x.Replies).ThenInclude(x => x.User)
+                .Skip(skip)
+                .Take(take == 0 ? postsCount : take)
+                .ToListAsync();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                var filteredPosts = allPosts
+                    .Where(x => x.Title.Contains(search) || x.Content.Contains(search))
+                    .ToList();
+                return filteredPosts;
+            }
+            return allPosts;
+        }
+
+        public async Task<int> GetPostsCountAsync() => await db.Posts.CountAsync();
+
         public async Task<Post> GetPostByIdAsync(int postId)
         {
-            var post = await db.Posts.Include(x => x.Replies).FirstOrDefaultAsync(x => x.PostId == postId);
+            var post = await db.Posts
+                .Include(x => x.User)
+                .Include(x => x.Replies)
+                .FirstOrDefaultAsync(x => x.PostId == postId);
             if (post == null) throw new ArgumentException($"Invalid post id: {postId}");
             return post;
         }

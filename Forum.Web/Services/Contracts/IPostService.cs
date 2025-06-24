@@ -4,6 +4,8 @@ namespace Forum.Web.Services.Contracts
 {
     public interface IPostService
     {
+        Task<IEnumerable<Post>> GetAllPostsAsync(string search = "", int skip = 0, int take = 0);
+        Task<int> GetPostsCountAsync();
         Task<Post> GetPostByIdAsync(int postId);
         Task<int> CreateAsync(string creatorId, string title, string content);
         Task<int> AddPostReplyAsync(string creatorId, int postId, string reply);
