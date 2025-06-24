@@ -127,5 +127,122 @@ namespace Forum.Web.Controllers
             };
             return View(model);
         }
+
+        public async Task<IActionResult> Details(
+            int id,
+            int replyPage = 1,
+            string sortReplies = "oldest",
+            int replyPageSize = 10)
+        {
+            var postDetailsModel = new PostDetailsViewModel
+            {
+                IsLoggedIn = true,
+                CurrentUserId = "user-123",
+                CanReply = true,
+                CanEdit = true,
+                CanDelete = false,
+                CanModerate = false,
+
+                Post = new PostDetail
+                {
+                    Id = 5,
+                    Title = "How to use ML.NET for sentiment analysis?",
+                    Content = "I'm trying to classify comments as rude or polite using ML.NET. Anyone done this?",
+                    AuthorName = "MLBeginner",
+                    AuthorId = "user-123",
+                    AuthorAvatar = "/images/avatars/mlbeginner.png",
+                    AuthorRole = "Member",
+                    CreatedAt = DateTime.UtcNow.AddDays(-2),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-1),
+                    ViewCount = 213,
+                    ReplyCount = 3,
+                    CategoryName = "Machine Learning",
+                    CategoryId = 2,
+                    CategoryColor = "info",
+                    IsPinned = false,
+                    IsLocked = false,
+                    Tags = new List<string> { "ml.net", "classification", "help" },
+                    LikeCount = 12,
+                    IsLikedByCurrentUser = true
+                },
+
+                Replies = new List<PostReply>
+                {
+                    new PostReply
+                    {
+                        Id = 1,
+                        Content = "Yes! I trained a custom model using a small dataset. Use `TextFeaturizingEstimator`.",
+                        AuthorName = "DataNerd",
+                        AuthorId = "user-456",
+                        AuthorAvatar = "/images/avatars/data_nerd.png",
+                        AuthorRole = "Member",
+                        CreatedAt = DateTime.UtcNow.AddDays(-1).AddHours(-4),
+                        LikeCount = 4,
+                        IsLikedByCurrentUser = false,
+                        IsAuthor = false,
+                        ParentReplyId = null
+                    },
+                    new PostReply
+                    {
+                        Id = 2,
+                        Content = "Make sure your training data is clean. That helped me a lot.",
+                        AuthorName = "MLGuru",
+                        AuthorId = "user-789",
+                        AuthorAvatar = "/images/avatars/mlguru.png",
+                        AuthorRole = "Moderator",
+                        CreatedAt = DateTime.UtcNow.AddHours(-22),
+                        LikeCount = 6,
+                        IsLikedByCurrentUser = true,
+                        IsAuthor = false,
+                        ParentReplyId = null
+                    },
+                    new PostReply
+                    {
+                        Id = 3,
+                        Content = "@MLGuru thanks! Did you use a pre-trained model or start from scratch?",
+                        AuthorName = "MLBeginner",
+                        AuthorId = "user-123",
+                        AuthorAvatar = "/images/avatars/mlbeginner.png",
+                        AuthorRole = "Member",
+                        CreatedAt = DateTime.UtcNow.AddHours(-12),
+                        LikeCount = 2,
+                        IsLikedByCurrentUser = false,
+                        IsAuthor = true,
+                        ParentReplyId = 2,
+                        ParentAuthorName = "MLGuru"
+                    }
+                },
+                ReplyPagination = new PaginationInfo
+                {
+                    CurrentPage = 1,
+                    PageSize = 10,
+                    TotalItems = 3,
+                    TotalPages = 1
+                },
+                RelatedPosts = new List<PostDetail>
+                {
+                    new PostDetail
+                    {
+                        Id = 6,
+                        Title = "Using ML.NET with ASP.NET Core",
+                        AuthorName = "DevTom",
+                        AuthorId = "user-901",
+                        AuthorAvatar = "/images/avatars/devtom.png",
+                        CreatedAt = DateTime.UtcNow.AddDays(-3),
+                        ViewCount = 94,
+                        ReplyCount = 2,
+                        CategoryName = "Machine Learning",
+                        CategoryId = 2,
+                        CategoryColor = "info",
+                        IsPinned = false,
+                        IsLocked = false,
+                        Tags = new List<string> { "ml.net", "integration" },
+                        LikeCount = 3,
+                        IsLikedByCurrentUser = false
+                    }
+                }
+            };
+            return View("Details", postDetailsModel);
+        }
     }
 }

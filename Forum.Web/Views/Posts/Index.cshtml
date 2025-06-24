@@ -147,7 +147,7 @@
                                                 <!-- Post Content -->
                                                 <div class="flex-grow-1">
                                                     <h6 class="mb-2">
-                                                        <a href="/Posts/@post.Id" class="text-decoration-none text-dark fw-semibold">
+                                                        <a asp-controller="Posts" asp-action="Details" asp-route-id="@post.Id" class="text-decoration-none text-dark fw-semibold">
                                                             @post.Title
                                                         </a>
                                                     </h6>

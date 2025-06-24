@@ -1,0 +1,467 @@
+﻿@model PostDetailsViewModel
+@{
+    ViewData["Title"] = Model.Post.Title;
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="/Posts" class="text-decoration-none">
+                    <i class="fas fa-comments me-1"></i>Forum
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="/Posts?categoryId=@Model.Post.CategoryId" class="text-decoration-none">
+                    @Model.Post.CategoryName
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Post.Title</li>
+        </ol>
+    </nav>
+
+    <!-- Post Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                <div>
+                    <h1 class="h2 mb-2">
+                        @if (Model.Post.IsPinned)
+                        {
+                            <i class="fas fa-thumbtack text-warning me-2" title="Pinned"></i>
+                        }
+                        @if (Model.Post.IsLocked)
+                        {
+                            <i class="fas fa-lock text-muted me-2" title="Locked"></i>
+                        }
+                        @Model.Post.Title
+                    </h1>
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <span class="badge bg-@Model.Post.CategoryColor">@Model.Post.CategoryName</span>
+                        <small class="text-muted">
+                            <i class="fas fa-eye me-1"></i>@Model.Post.ViewCount views
+                        </small>
+                        <small class="text-muted">
+                            <i class="fas fa-comments me-1"></i>@Model.Post.ReplyCount replies
+                        </small>
+                        @if (Model.Post.Tags.Any())
+                        {
+                            <div class="d-flex gap-1 flex-wrap">
+                                @foreach (var tag in Model.Post.Tags)
+                                {
+                                    <span class="badge bg-light text-dark border">#@tag</span>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    @if (Model.CanEdit)
+                    {
+                        <a href="/Posts/@Model.Post.Id/Edit" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit me-1"></i>Edit
+                        </a>
+                    }
+                    @if (Model.CanModerate)
+                    {
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-cog me-1"></i>Moderate
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="/Posts/@Model.Post.Id/Pin">
+                                        <i class="fas fa-thumbtack me-2"></i>@(Model.Post.IsPinned ? "Unpin" : "Pin") Post
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/Posts/@Model.Post.Id/Lock">
+                                        <i class="fas fa-lock me-2"></i>@(Model.Post.IsLocked ? "Unlock" : "Lock") Post
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="/Posts/@Model.Post.Id/Delete">
+                                        <i class="fas fa-trash me-2"></i>Delete Post
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <!-- Original Post -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <!-- Author Info -->
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="me-3">
+                            @if (!string.IsNullOrEmpty(Model.Post.AuthorAvatar))
+                            {
+                                <img src="@Model.Post.AuthorAvatar" alt="@Model.Post.AuthorName" 
+                                     class="rounded-circle" width="50" height="50">
+                            }
+                            else
+                            {
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="width: 50px; height: 50px;">
+                                    @Model.Post.AuthorName.FirstOrDefault()
+                                </div>
+                            }
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold">@Model.Post.AuthorName</div>
+                            <small class="text-muted">
+                                @Model.Post.AuthorRole
+                                @if (Model.Post.AuthorRole == "Admin")
+                                {
+                                    <i class="fas fa-crown text-warning ms-1" title="Administrator"></i>
+                                }
+                                else if (Model.Post.AuthorRole == "Moderator")
+                                {
+                                    <i class="fas fa-shield-alt text-info ms-1" title="Moderator"></i>
+                                }
+                            </small>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                @Model.Post.CreatedAt.ToString("MMM dd, yyyy 'at' HH:mm")
+                            </small>
+                            @if (Model.Post.UpdatedAt.HasValue)
+                            {
+                                <br>
+                                <small class="text-muted">
+                                    <i class="fas fa-edit me-1"></i>
+                                    Edited @Model.Post.UpdatedAt.Value.ToString("MMM dd, yyyy 'at' HH:mm")
+                                </small>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Post Content -->
+                    <div class="post-content mb-3">
+                        @Html.Raw(Model.Post.Content.Replace("\n", "<br>"))
+                    </div>
+
+                    <!-- Post Actions -->
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <div class="d-flex gap-3">
+                            @if (Model.IsLoggedIn)
+                            {
+                                <button class="btn btn-sm @(Model.Post.IsLikedByCurrentUser ? "btn-primary" : "btn-outline-primary")" 
+                                        onclick="toggleLike('post', @Model.Post.Id)">
+                                    <i class="fas fa-thumbs-up me-1"></i>
+                                    <span id="post-like-count">@Model.Post.LikeCount</span>
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="showReplyForm()">
+                                    <i class="fas fa-reply me-1"></i>Reply
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="sharePost()">
+                                    <i class="fas fa-share me-1"></i>Share
+                                </button>
+                            }
+                            else
+                            {
+                                <span class="text-muted">
+                                    <i class="fas fa-thumbs-up me-1"></i>@Model.Post.LikeCount likes
+                                </span>
+                            }
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="reportPost(@Model.Post.Id)">
+                                <i class="fas fa-flag me-1"></i>Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reply Form -->
+            @if (Model.IsLoggedIn && Model.CanReply && !Model.Post.IsLocked)
+            {
+                <div class="card shadow-sm border-0 mb-4" id="reply-form" style="display: none;">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="fas fa-reply me-2"></i>Reply to this post
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="/Posts/@Model.Post.Id/Reply">
+                            <div class="mb-3">
+                                <textarea class="form-control" name="content" rows="4" 
+                                          placeholder="Write your reply..." required></textarea>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-1"></i>Post Reply
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="hideReplyForm()">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+            else if (!Model.IsLoggedIn)
+            {
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body text-center py-4">
+                        <i class="fas fa-lock text-muted mb-2" style="font-size: 2rem;"></i>
+                        <h5 class="text-muted">Join the conversation</h5>
+                        <p class="text-muted mb-3">Please log in to reply to this post</p>
+                        <a href="/Identity/Account/Login" class="btn btn-primary me-2">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </a>
+                        <a href="/Identity/Account/Register" class="btn btn-outline-primary">
+                            <i class="fas fa-user-plus me-1"></i>Register
+                        </a>
+                    </div>
+                </div>
+            }
+            else if (Model.Post.IsLocked)
+            {
+                <div class="alert alert-warning">
+                    <i class="fas fa-lock me-2"></i>
+                    This post is locked and no longer accepting replies.
+                </div>
+            }
+
+            <!-- Replies Section -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-comments me-2"></i>
+                        Replies (@Model.Post.ReplyCount)
+                    </h5>
+                    @if (Model.Replies.Any())
+                    {
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                Sort by
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="?sortReplies=oldest">Oldest First</a></li>
+                                <li><a class="dropdown-item" href="?sortReplies=newest">Newest First</a></li>
+                                <li><a class="dropdown-item" href="?sortReplies=popular">Most Popular</a></li>
+                            </ul>
+                        </div>
+                    }
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Replies.Any())
+                    {
+                        @foreach (var reply in Model.Replies)
+                        {
+                            <div class="border-bottom p-4" id="reply-@reply.Id">
+                                <!-- Reply Author Info -->
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="me-3">
+                                        @if (!string.IsNullOrEmpty(reply.AuthorAvatar))
+                                        {
+                                            <img src="@reply.AuthorAvatar" alt="@reply.AuthorName" 
+                                                 class="rounded-circle" width="40" height="40">
+                                        }
+                                        else
+                                        {
+                                            <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                                 style="width: 40px; height: 40px;">
+                                                @reply.AuthorName.FirstOrDefault()
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold">
+                                            @reply.AuthorName
+                                            @if (reply.IsAuthor)
+                                            {
+                                                <span class="badge bg-primary ms-1">Author</span>
+                                            }
+                                        </div>
+                                        <small class="text-muted">
+                                            @reply.AuthorRole
+                                            @if (reply.AuthorRole == "Admin")
+                                            {
+                                                <i class="fas fa-crown text-warning ms-1" title="Administrator"></i>
+                                            }
+                                            else if (reply.AuthorRole == "Moderator")
+                                            {
+                                                <i class="fas fa-shield-alt text-info ms-1" title="Moderator"></i>
+                                            }
+                                        </small>
+                                    </div>
+                                    <div class="text-end">
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>
+                                            @reply.CreatedAt.ToString("MMM dd, yyyy 'at' HH:mm")
+                                        </small>
+                                        @if (reply.UpdatedAt.HasValue)
+                                        {
+                                            <br>
+                                            <small class="text-muted">
+                                                <i class="fas fa-edit me-1"></i>Edited
+                                            </small>
+                                        }
+                                    </div>
+                                </div>
+
+                                <!-- Parent Reply Reference -->
+                                @if (reply.ParentReplyId.HasValue)
+                                {
+                                    <div class="bg-light rounded p-2 mb-3 border-start border-primary border-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-reply me-1"></i>
+                                            Replying to <strong>@reply.ParentAuthorName</strong>
+                                        </small>
+                                    </div>
+                                }
+
+                                <!-- Reply Content -->
+                                <div class="reply-content mb-3">
+                                    @Html.Raw(reply.Content.Replace("\n", "<br>"))
+                                </div>
+
+                                <!-- Reply Actions -->
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex gap-3">
+                                        @if (Model.IsLoggedIn)
+                                        {
+                                            <button class="btn btn-sm @(reply.IsLikedByCurrentUser ? "btn-primary" : "btn-outline-primary")" 
+                                                    onclick="toggleLike('reply', @reply.Id)">
+                                                <i class="fas fa-thumbs-up me-1"></i>
+                                                <span id="reply-like-count-@reply.Id">@reply.LikeCount</span>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary" 
+                                                    onclick="replyToReply(@reply.Id, '@reply.AuthorName')">
+                                                <i class="fas fa-reply me-1"></i>Reply
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                <i class="fas fa-thumbs-up me-1"></i>@reply.LikeCount likes
+                                            </span>
+                                        }
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="reportReply(@reply.Id)">
+                                            <i class="fas fa-flag me-1"></i>Report
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Reply Pagination -->
+                        @if (Model.ReplyPagination.TotalPages > 1)
+                        {
+                            <div class="p-3 border-top">
+                                <nav aria-label="Replies pagination">
+                                    <ul class="pagination pagination-sm justify-content-center mb-0">
+                                        @if (Model.ReplyPagination.HasPrevious)
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" href="?replyPage=@(Model.ReplyPagination.CurrentPage - 1)">
+                                                    <i class="fas fa-chevron-left"></i>
+                                                </a>
+                                            </li>
+                                        }
+
+                                        @for (int i = Math.Max(1, Model.ReplyPagination.CurrentPage - 2); i <= Math.Min(Model.ReplyPagination.TotalPages, Model.ReplyPagination.CurrentPage + 2); i++)
+                                        {
+                                            <li class="page-item @(i == Model.ReplyPagination.CurrentPage ? "active" : "")">
+                                                <a class="page-link" href="?replyPage=@i">@i</a>
+                                            </li>
+                                        }
+
+                                        @if (Model.ReplyPagination.HasNext)
+                                        {
+                                            <li class="page-item">
+                                                <a class="page-link" href="?replyPage=@(Model.ReplyPagination.CurrentPage + 1)">
+                                                    <i class="fas fa-chevron-right"></i>
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </nav>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-comments text-muted mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="text-muted">No replies yet</h5>
+                            <p class="text-muted">Be the first to reply to this post!</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-3">
+            <!-- Related Posts -->
+            @if (Model.RelatedPosts.Any())
+            {
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-link me-2"></i>Related Posts
+                        </h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            @foreach (var relatedPost in Model.RelatedPosts.Take(5))
+                            {
+                                <a href="/Posts/@relatedPost.Id" class="list-group-item list-group-item-action border-0">
+                                    <div class="fw-semibold small">@relatedPost.Title</div>
+                                    <small class="text-muted">
+                                        @relatedPost.ReplyCount replies • @relatedPost.ViewCount views
+                                    </small>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Post Stats -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Post Statistics
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 text-center">
+                        <div class="col-6">
+                            <div class="h5 text-primary mb-1">@Model.Post.ViewCount</div>
+                            <small class="text-muted">Views</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="h5 text-success mb-1">@Model.Post.ReplyCount</div>
+                            <small class="text-muted">Replies</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="h5 text-info mb-1">@Model.Post.LikeCount</div>
+                            <small class="text-muted">Likes</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="h5 text-warning mb-1">@Model.Post.CreatedAt.ToString("MMM dd")</div>
+                            <small class="text-muted">Created</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
