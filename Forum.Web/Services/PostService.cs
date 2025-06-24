@@ -1,7 +1,5 @@
-﻿using Forum.Web.Data.Entities.Enums;
-using Forum.Web.Data.Entities;
+﻿using Forum.Web.Data.Entities;
 using Forum.Web.Data;
-using Forum.Web.Dtos;
 using Forum.Web.Services.Contracts;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,31 +10,11 @@ namespace Forum.Web.Services
         private readonly ApplicationDbContext db;
         public PostService(ApplicationDbContext db) => this.db = db;
 
-        public async Task<(IEnumerable<PostDto>, string?)> GetForThreadAsync(long threadId, int limit, DateTime? before)
+        public async Task<Post> GetPostByIdAsync(int postId)
         {
-            //var cutoff = before ?? DateTime.UtcNow;
-            //var q = from p in db.Posts
-            //        where p.ThreadId == threadId
-            //           && p.Status == PostStatus.Approved
-            //           && p.CreatedAt < cutoff
-            //        orderby p.CreatedAt descending
-            //        select new PostDto
-            //        {
-            //            PostId = p.PostId,
-            //            Content = p.Content,
-            //            Creator = p.Creator.NickName,
-            //            CreatedAt = p.CreatedAt
-            //        };
-
-            //var page = await q.Take(limit + 1).ToListAsync();
-            //var hasMore = page.Count == limit + 1;
-            //if (hasMore) page.RemoveAt(limit);
-
-            //var nextCursor = hasMore
-            //    ? page.Last().CreatedAt.ToString("o")
-            //    : null;
-
-            return (null, "");
+            var post = await db.Posts.Include(x => x.Replies).FirstOrDefaultAsync(x => x.PostId == postId);
+            if (post == null) throw new ArgumentException($"Invalid post id: {postId}");
+            return post;
         }
 
         public async Task<int> CreateAsync(string creatorId, string title, string content)
@@ -53,6 +31,32 @@ namespace Forum.Web.Services
             var postResult = await db.Posts.AddAsync(post);
             await db.SaveChangesAsync();
             return postResult.Entity.PostId;
+        }
+
+        public async Task<int> AddPostReplyAsync(string creatorId, int postId, string reply)
+        {
+            var replyEntity = new Reply
+            {
+                Content = reply,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                IsFlagged = false,
+                IsReviewed = true,
+                PostId = postId,
+                UserId = creatorId
+            };
+
+            var replyResult = await db.Replies.AddAsync(replyEntity);
+            await db.SaveChangesAsync();
+            return replyResult.Entity.Id;
+        }
+
+        public async Task<int?> DeleteReplyAsync(int replyId)
+        {
+            var reply = await db.Replies.FindAsync(replyId);
+            db.Replies.Remove(reply);
+            await db.SaveChangesAsync();
+            return reply.PostId;
         }
     }
 }

@@ -142,119 +142,37 @@ namespace Forum.Web.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> Details(
-            int id,
-            int replyPage = 1,
-            string sortReplies = "oldest",
-            int replyPageSize = 10)
+        public async Task<IActionResult> Details(int id)
         {
-            var postDetailsModel = new PostDetailsViewModel
+            var post = await _postService.GetPostByIdAsync(id);
+            var user = await _userManager.GetUserAsync(User);
+            var postDetailsModel = new PostDetailsViewModel()
             {
-                IsLoggedIn = true,
-                CurrentUserId = "user-123",
-                CanReply = true,
-                CanEdit = true,
-                CanDelete = false,
-                CanModerate = false,
-
                 Post = new PostDetail
                 {
-                    Id = 5,
-                    Title = "How to use ML.NET for sentiment analysis?",
-                    Content = "I'm trying to classify comments as rude or polite using ML.NET. Anyone done this?",
-                    AuthorName = "MLBeginner",
-                    AuthorId = "user-123",
-                    AuthorAvatar = "/images/avatars/mlbeginner.png",
-                    AuthorRole = "Member",
-                    CreatedAt = DateTime.UtcNow.AddDays(-2),
-                    UpdatedAt = DateTime.UtcNow.AddDays(-1),
-                    ViewCount = 213,
-                    ReplyCount = 3,
-                    CategoryName = "Machine Learning",
-                    CategoryId = 2,
-                    CategoryColor = "info",
-                    IsPinned = false,
-                    IsLocked = false,
-                    Tags = new List<string> { "ml.net", "classification", "help" },
-                    LikeCount = 12,
-                    IsLikedByCurrentUser = true
+                    PostId = id,
+                    Title = post.Title,
+                    Content = post.Content,
+                    UserId = post.UserId,
+                    AuthorName = post.User.UserName!,
+                    AuthorEmail = post.User.Email!,
+                    CreatedAt = post.CreatedAt,
+                    LastUpdated = post.LastUpdated,
+                    ReplyCount = post.Replies.Count
                 },
-
-                Replies = new List<PostReply>
+                Replies = post.Replies.Select(x => new PostReply 
                 {
-                    new PostReply
-                    {
-                        Id = 1,
-                        Content = "Yes! I trained a custom model using a small dataset. Use `TextFeaturizingEstimator`.",
-                        AuthorName = "DataNerd",
-                        AuthorId = "user-456",
-                        AuthorAvatar = "/images/avatars/data_nerd.png",
-                        AuthorRole = "Member",
-                        CreatedAt = DateTime.UtcNow.AddDays(-1).AddHours(-4),
-                        LikeCount = 4,
-                        IsLikedByCurrentUser = false,
-                        IsAuthor = false,
-                        ParentReplyId = null
-                    },
-                    new PostReply
-                    {
-                        Id = 2,
-                        Content = "Make sure your training data is clean. That helped me a lot.",
-                        AuthorName = "MLGuru",
-                        AuthorId = "user-789",
-                        AuthorAvatar = "/images/avatars/mlguru.png",
-                        AuthorRole = "Moderator",
-                        CreatedAt = DateTime.UtcNow.AddHours(-22),
-                        LikeCount = 6,
-                        IsLikedByCurrentUser = true,
-                        IsAuthor = false,
-                        ParentReplyId = null
-                    },
-                    new PostReply
-                    {
-                        Id = 3,
-                        Content = "@MLGuru thanks! Did you use a pre-trained model or start from scratch?",
-                        AuthorName = "MLBeginner",
-                        AuthorId = "user-123",
-                        AuthorAvatar = "/images/avatars/mlbeginner.png",
-                        AuthorRole = "Member",
-                        CreatedAt = DateTime.UtcNow.AddHours(-12),
-                        LikeCount = 2,
-                        IsLikedByCurrentUser = false,
-                        IsAuthor = true,
-                        ParentReplyId = 2,
-                        ParentAuthorName = "MLGuru"
-                    }
-                },
-                ReplyPagination = new PaginationInfo
-                {
-                    CurrentPage = 1,
-                    PageSize = 10,
-                    TotalItems = 3,
-                    TotalPages = 1
-                },
-                RelatedPosts = new List<PostDetail>
-                {
-                    new PostDetail
-                    {
-                        Id = 6,
-                        Title = "Using ML.NET with ASP.NET Core",
-                        AuthorName = "DevTom",
-                        AuthorId = "user-901",
-                        AuthorAvatar = "/images/avatars/devtom.png",
-                        CreatedAt = DateTime.UtcNow.AddDays(-3),
-                        ViewCount = 94,
-                        ReplyCount = 2,
-                        CategoryName = "Machine Learning",
-                        CategoryId = 2,
-                        CategoryColor = "info",
-                        IsPinned = false,
-                        IsLocked = false,
-                        Tags = new List<string> { "ml.net", "integration" },
-                        LikeCount = 3,
-                        IsLikedByCurrentUser = false
-                    }
-                }
+                    ReplyId = x.Id,
+                    Content = x.Content,
+                    UserId = x.UserId,
+                    AuthorName = x.User.UserName!,
+                    AuthorEmail = x.User.Email!,
+                    CreatedAt = x.CreatedAt,
+                    LastUpdated = (DateTime)x.UpdatedAt!
+                }).ToList(),
+                CanEdit = user!.Id == post.UserId,
+                CanDelete = user.Id == post.UserId,
+                CurrentUserId = user.Id
             };
             return View("Details", postDetailsModel);
         }
@@ -262,6 +180,21 @@ namespace Forum.Web.Controllers
         public async Task<IActionResult> Create()
         {
             return View();
+        }
+
+        [HttpPost("Posts/{postId}/Reply")]
+        public async Task<IActionResult> PostReply(int postId, string content)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            await _postService.AddPostReplyAsync(user.Id, postId, content);
+            return RedirectToAction("Details", new { id = postId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteReply(int id)
+        {
+            var postId = await _postService.DeleteReplyAsync(id);
+            return RedirectToAction("Details", new { id = postId });
         }
 
         [HttpPost]
@@ -272,7 +205,7 @@ namespace Forum.Web.Controllers
 
             var user = await _userManager.GetUserAsync(User);
             var postId = await _postService.CreateAsync(user.Id, post.Title, post.Content);
-            return RedirectToAction(nameof(Details), postId);
+            return RedirectToAction(nameof(Details), new { Id = postId });
         }
     }
 }
