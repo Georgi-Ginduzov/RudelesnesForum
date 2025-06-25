@@ -1,3 +1,4 @@
+using Forum.Web.Configuration;
 using Forum.Web.Data;
 using Forum.Web.Data.Entities;
 using Forum.Web.Repositories.Contracts;
@@ -19,6 +20,8 @@ namespace Forum.Web
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException();
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
+            builder.Services.Configure<ContentModerationConfiguration>(builder.Configuration.GetSection("ContentModeration"));
+
             builder.Services
                 .AddScoped<IPostRepository, PostRepository>()
                 .AddScoped<IThreadRepository, ThreadRepository>()
@@ -27,7 +30,8 @@ namespace Forum.Web
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             builder.Services
-                .AddScoped<IPostService, PostService>();
+                .AddScoped<IPostService, PostService>()
+                .AddSingleton<IContentModerationService, ContentModerationService>();
 
             builder.Services
                 .AddIdentity<ApplicationUser, IdentityRole>()
