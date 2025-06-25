@@ -41,7 +41,7 @@ namespace Forum.Web.Services
         {
             var post = await db.Posts
                 .Include(x => x.User)
-                .Include(x => x.Replies)
+                .Include(x => x.Replies).ThenInclude(x => x.User)
                 .FirstOrDefaultAsync(x => x.PostId == postId);
             if (post == null) throw new ArgumentException($"Invalid post id: {postId}");
             return post;

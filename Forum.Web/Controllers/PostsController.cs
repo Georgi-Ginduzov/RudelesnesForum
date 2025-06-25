@@ -62,7 +62,7 @@ namespace Forum.Web.Controllers
                     AuthorEmail = post.User?.Email ?? string.Empty,
                     CreatedAt = post.CreatedAt,
                     LastUpdated = post.LastUpdated,
-                    ReplyCount = post.Replies.Count
+                    ReplyCount = post.Replies.Count(x => !x.IsFlagged && x.IsReviewed)
                 },
                 Replies = post.Replies.Where(x => user?.Id == x.UserId || 
                                                   isAdmin || isModerator || 
