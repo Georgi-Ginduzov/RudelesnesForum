@@ -2,6 +2,7 @@
 using Forum.Web.Data;
 using Forum.Web.Services.Contracts;
 using Microsoft.EntityFrameworkCore;
+using Azure.Core;
 
 namespace Forum.Web.Services
 {
@@ -88,6 +89,15 @@ namespace Forum.Web.Services
             db.Replies.Remove(reply);
             await db.SaveChangesAsync();
             return reply.PostId;
+        }
+
+        public async Task DeletePostAsync(int postId)
+        {
+            var post = await db.Posts.FindAsync(postId);
+            if (post is null) return;
+
+            db.Remove(post);
+            await db.SaveChangesAsync();
         }
     }
 }

@@ -9,6 +9,7 @@ namespace Forum.Web.Services.Contracts
         Task<Post> GetPostByIdAsync(int postId);
         Task<int> CreateAsync(string creatorId, string title, string content);
         Task<(int replyId, bool isFlagged)> AddPostReplyAsync(string creatorId, int postId, string reply);
+        Task DeletePostAsync(int postId);
         Task<int?> DeleteReplyAsync(int replyId);
     }
 }

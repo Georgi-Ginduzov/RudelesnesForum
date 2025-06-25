@@ -2,9 +2,9 @@
 {
     public class AdminDashboardViewModel
     {
-        public int TotalUsers { get; set; }
-        public int TotalPosts { get; set; }
-        public int PendingReports { get; set; }
-        public int ActiveUsers { get; set; }
+        public int TotalUsersCount { get; set; }
+        public int AdminsCount { get; set; }
+        public int ModeratorsCount { get; set; }
+        public int UsersCount { get; set; }
     }
 }

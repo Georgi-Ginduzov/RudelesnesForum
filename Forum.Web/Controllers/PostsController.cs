@@ -115,6 +115,13 @@ namespace Forum.Web.Controllers
             return RedirectToAction("Details", new { id = postId });
         }
 
+        [HttpPost("Posts/Delete/{id}")]
+        public async Task<IActionResult> DeletePost(int id)
+        {
+            await _postService.DeletePostAsync(id);
+            return RedirectToAction(nameof(Index));
+        }
+
         [HttpPost]
         public async Task<IActionResult> DeleteReply(int id)
         {
