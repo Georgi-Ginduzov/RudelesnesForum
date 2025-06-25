@@ -84,20 +84,12 @@
                                         <div class="col-md-8">
                                             <div class="d-flex align-items-start">
                                                 <div class="me-3">
-                                                    @if (discussion.IsPinned)
-                                                    {
-                                                        <i class="fas fa-thumbtack text-warning"></i>
-                                                    }
-                                                    else
-                                                    {
-                                                        <i class="fas fa-comment text-primary"></i>
-                                                    }
+                                                    <i class="fas fa-comment text-primary"></i>
                                                 </div>
                                                 <div>
                                                     <h6 class="mb-1 text-dark">@discussion.Title</h6>
                                                     <small class="text-muted">
                                                         by <strong>@discussion.AuthorName</strong>
-                                                        in <span class="badge bg-secondary">@discussion.Category</span>
                                                     </small>
                                                 </div>
                                             </div>
@@ -154,45 +146,6 @@
                     <a href="/Identity/Account/Login" class="btn btn-outline-primary w-100">
                         <i class="fas fa-sign-in-alt me-2"></i>Already a Member?
                     </a>
-                </div>
-            </div>
-
-            <!-- Categories Preview -->
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white border-0">
-                    <h5 class="mb-0">
-                        <i class="fas fa-tags text-info me-2"></i>Forum Categories
-                    </h5>
-                </div>
-                <div class="card-body p-0">
-                    @if (Model.Categories.Any())
-                    {
-                        <div class="list-group list-group-flush">
-                            @foreach (var category in Model.Categories.Take(6))
-                            {
-                                <div class="list-group-item border-0 py-2">
-                                    <div class="d-flex align-items-center">
-                                        <div class="me-3">
-                                            <i class="@category.IconClass text-muted"></i>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <div class="fw-semibold">@category.Name</div>
-                                            <small class="text-muted">@category.Description</small>
-                                        </div>
-                                        <div class="text-end">
-                                            <small class="text-muted">@category.PostCount posts</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="text-center py-3">
-                            <small class="text-muted">Categories coming soon</small>
-                        </div>
-                    }
                 </div>
             </div>
         </div>
