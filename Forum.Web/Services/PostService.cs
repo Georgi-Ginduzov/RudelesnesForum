@@ -93,8 +93,13 @@ namespace Forum.Web.Services
 
         public async Task DeletePostAsync(int postId)
         {
-            var post = await db.Posts.FindAsync(postId);
+            var post = await db.Posts.Include(x => x.Replies).FirstOrDefaultAsync(x => x.PostId == postId);
             if (post is null) return;
+
+            foreach (var reply in post.Replies)
+            {
+                db.Remove(reply);
+            }
 
             db.Remove(post);
             await db.SaveChangesAsync();
