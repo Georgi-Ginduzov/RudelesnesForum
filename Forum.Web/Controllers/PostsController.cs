@@ -48,6 +48,8 @@ namespace Forum.Web.Controllers
         {
             var post = await _postService.GetPostByIdAsync(id);
             var user = await _userManager.GetUserAsync(User);
+            var isModerator = await _userManager.IsInRoleAsync(user, "Moderator");
+            var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
             var postDetailsModel = new PostDetailsViewModel()
             {
                 Post = new PostDetail
@@ -60,9 +62,12 @@ namespace Forum.Web.Controllers
                     AuthorEmail = post.User?.Email ?? string.Empty,
                     CreatedAt = post.CreatedAt,
                     LastUpdated = post.LastUpdated,
-                    ReplyCount = post.Replies.Count
+                    ReplyCount = post.Replies.Count(x => !x.IsFlagged && x.IsReviewed)
                 },
-                Replies = post.Replies.Where(x => user?.Id == x.UserId || !x.IsFlagged && x.IsReviewed).Select(x => new PostReply 
+                Replies = post.Replies.Where(x => user?.Id == x.UserId || 
+                                                  isAdmin || isModerator || 
+                                                  !x.IsFlagged && x.IsReviewed)
+                .Select(x => new PostReply 
                 {
                     ReplyId = x.Id,
                     Content = x.Content,

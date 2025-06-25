@@ -31,6 +31,7 @@ namespace Forum.Web
 
             builder.Services
                 .AddScoped<IPostService, PostService>()
+                .AddScoped<IModerationService, ModerationService>()
                 .AddSingleton<IContentModerationService, ContentModerationService>();
 
             builder.Services

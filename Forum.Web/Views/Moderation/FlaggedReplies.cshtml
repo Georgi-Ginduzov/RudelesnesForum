@@ -1,0 +1,177 @@
+﻿@model List<ReplyModerationViewModel>
+
+@{
+    ViewData["Title"] = "Flagged Replies";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="display-6 mb-2">
+                <i class="fas fa-flag text-warning me-2"></i>Flagged Replies
+            </h2>
+            <p class="text-muted mb-0">
+                Review and moderate flagged community content
+            </p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <div class="d-flex gap-2 justify-content-md-end">
+                <span class="badge bg-warning text-dark fs-6">
+                    @Model.Count pending review@(Model.Count != 1 ? "s" : "")
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="h4 text-warning mb-1">@Model.Count</div>
+                            <small class="text-muted">Pending Reviews</small>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="h4 text-info mb-1">@Model.Where(r => r.CreatedAt >= DateTime.Today).Count()</div>
+                            <small class="text-muted">Today</small>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="h4 text-primary mb-1">@Model.Where(r => r.CreatedAt >= DateTime.Today.AddDays(-7)).Count()</div>
+                            <small class="text-muted">This Week</small>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="h4 text-secondary mb-1">@Model.GroupBy(r => r.UserId).Count()</div>
+                            <small class="text-muted">Unique Users</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            @if (!Model.Any())
+            {
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-check-circle text-success mb-3" style="font-size: 3rem;"></i>
+                        <h4 class="text-success">All Clear!</h4>
+                        <p class="text-muted mb-0">There are no flagged replies awaiting review.</p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                @foreach (var reply in Model.OrderByDescending(r => r.CreatedAt))
+                {
+                    <div class="card mb-4 border-0 shadow-sm" id="reply-@reply.Id">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-warning text-dark me-2">
+                                    <i class="fas fa-flag me-1"></i>Flagged
+                                </span>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    @reply.CreatedAt.ToString("MMM dd, yyyy 'at' HH:mm")
+                                </small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if (reply.CreatedAt <= DateTime.Now.AddHours(-24))
+                                {
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>Urgent
+                                    </span>
+                                }
+                                else if (reply.CreatedAt <= DateTime.Now.AddHours(-6))
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="fas fa-clock me-1"></i>Priority
+                                    </span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="mb-3 p-3 bg-light rounded">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-link text-muted me-2"></i>
+                                    <strong>Original Post:</strong>
+                                    <a href="@Url.Action("Details", "Posts", new { id = reply.PostId })"
+                                       class="ms-2 text-decoration-none" target="_blank">
+                                        @reply.PostTitle
+                                        <i class="fas fa-external-link-alt ms-1 small"></i>
+                                    </a>
+                                </div>
+                                <small class="text-muted">
+                                    Click to view full context in new tab
+                                </small>
+                            </div>
+
+                            <div class="mb-4">
+                                <h6 class="text-muted mb-2">
+                                    <i class="fas fa-comment me-1"></i>Flagged Reply Content:
+                                </h6>
+                                <div class="p-3 border-start border-warning border-3 bg-light">
+                                    <div class="reply-content">
+                                        @Html.Raw(reply.Content.Replace("\n", "<br>"))
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                                <div class="d-flex gap-2">
+                                    <form asp-action="Review" method="post" class="d-inline">
+                                        <input type="hidden" name="replyId" value="@reply.Id" />
+                                        <input name="approve" type="hidden" value="true" />
+                                        <button type="submit" class="btn btn-success"
+                                                onclick="return confirm('Are you sure you want to approve this reply?')">
+                                            <i class="fas fa-check me-2"></i>Approve
+                                        </button>
+                                    </form>
+
+                                    <form asp-action="Review" method="post" class="d-inline">
+                                        <input type="hidden" name="replyId" value="@reply.Id" />
+                                        <input name="approve" type="hidden" value="false" />
+                                        <button type="submit" class="btn btn-danger"
+                                                onclick="return confirm('Are you sure you want to reject this reply? This action cannot be undone.')">
+                                            <i class="fas fa-times me-2"></i>Reject
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <a href="@Url.Action("Details", "Posts", new { id = reply.PostId })#reply-@reply.Id"
+                                       class="btn btn-outline-info btn-sm" target="_blank">
+                                        <i class="fas fa-eye me-1"></i>View Context
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .reply-content {
+        line-height: 1.6;
+        word-wrap: break-word;
+    }
+
+    .card {
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+    }
+
+    .border-start {
+        border-left-width: 4px !important;
+    }
+</style>
