@@ -11,10 +11,10 @@ namespace Forum.Web.Controllers
             {
                 var model = new AdminDashboardViewModel
                 {
-                    ActiveUsers = 5,
-                    PendingReports = 3,
-                    TotalPosts = 14,
-                    TotalUsers = 10
+                    UsersCount = 5,
+                    ModeratorsCount = 3,
+                    AdminsCount = 14,
+                    TotalUsersCount = 10
                 };
                 return View("Admin", model);
             }
