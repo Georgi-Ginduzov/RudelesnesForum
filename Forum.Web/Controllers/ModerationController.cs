@@ -31,20 +31,11 @@ namespace Forum.Web.Controllers
             return View("FlaggedReplies", flaggedRepliesViewModel);
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Review(int replyId, bool approve)
-        //{
-        //    var reply = await _context.Replies.FindAsync(replyId);
-        //    if (reply == null) return NotFound();
-
-        //    reply.IsReviewed = true;
-        //    reply.IsFlagged = !approve;
-
-        //    // Optional: if not approved, you could soft delete or hide
-        //    // e.g. reply.IsVisible = false;
-
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(FlaggedReplies));
-        //}
+        [HttpPost]
+        public async Task<IActionResult> Review(int replyId, bool approve)
+        {
+            await _moderationService.ReviewReply(replyId, approve);
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

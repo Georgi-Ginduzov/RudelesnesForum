@@ -25,9 +25,21 @@ namespace Forum.Web.Services
             return flaggedReplies;
         }
 
-        public Task<bool> ReviewReply(int replyId, bool approved)
+        public async Task ReviewReply(int replyId, bool approved)
         {
-            throw new NotImplementedException();
+            var reply = await _dbContext.Replies.FindAsync(replyId);
+            if (reply is null) return;
+
+            if (approved)
+            {
+                reply.IsReviewed = true;
+                reply.IsFlagged = false;
+            }
+            else
+            {
+                _dbContext.Remove(reply);
+            }
+            await _dbContext.SaveChangesAsync();    
         }
     }
 }
