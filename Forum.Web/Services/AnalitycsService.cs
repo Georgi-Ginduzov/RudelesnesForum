@@ -25,7 +25,7 @@ namespace Forum.Web.Services
 
                 return new AdminDashboardViewModel
                 {
-                    TotalUsers = totalUsers,
+                    TotalUsersCount = totalUsers,
                     AdminsCount = moderatorsCount,
                     ModeratorsCount = adminsCount,
                     UsersCount = usersCount,
@@ -122,7 +122,7 @@ namespace Forum.Web.Services
 
         // Admin
         private async Task<int> ActiveUsersCountAsync()
-            => await worker.UserRepository.Entities.CountAsync(u => u.IsActive);
+            => await worker.UserRepository.Entities.CountAsync(/*u => u.IsActive*/);
 
         private async ValueTask<int> UsersByRoleCountAsync(string role, UserManager<ApplicationUser> userManager)
         {
