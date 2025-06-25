@@ -32,6 +32,8 @@ namespace Forum.Web
             builder.Services
                 .AddScoped<IPostService, PostService>()
                 .AddScoped<IModerationService, ModerationService>()
+                .AddScoped<IAnalyticsService, AnalitycsService>()
+                .AddScoped<IAdministrationService, AdministrationService>()
                 .AddSingleton<IContentModerationService, ContentModerationService>();
 
             builder.Services
@@ -40,9 +42,6 @@ namespace Forum.Web
                 .AddDefaultTokenProviders()
                 .AddDefaultUI();
 
-            builder.Services
-                .AddScoped<IAnalyticsService, AnalitycsService>();
-            
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
             builder.Services.AddEndpointsApiExplorer();
