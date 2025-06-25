@@ -10,13 +10,22 @@ namespace Forum.Web.Services
     public class ContentModerationService : IContentModerationService
     {
         private readonly ContentModerationConfiguration _configuration;
+        private PredictionEngine<CommentInput, CommentPrediction>? _predictionEngine;
 
         public ContentModerationService(IOptionsMonitor<ContentModerationConfiguration> options)
         {
             _configuration = options.CurrentValue;
+            InitializePredictor();
         }
 
         public bool IsRudeAsync(string text)
+        {
+            var comment = new CommentInput { comment_text = text };
+            var predictionResult = _predictionEngine?.Predict(comment);
+            return predictionResult?.ShouldBlock ?? false;
+        }
+
+        private void InitializePredictor()
         {
             var assembly = Assembly.GetExecutingAssembly();
             var assemblyPath = assembly.Location;
@@ -24,11 +33,7 @@ namespace Forum.Web.Services
 
             var mlContext = new MLContext();
             var loadedModel = mlContext.Model.Load(modelPath, out var modelSchema);
-            var predictor = mlContext.Model.CreatePredictionEngine<CommentInput, CommentPrediction>(loadedModel);
-
-            var comment = new CommentInput { comment_text = text };
-            var predictionResult = predictor.Predict(comment);
-            return predictionResult.ShouldBlock;
+            _predictionEngine = mlContext.Model.CreatePredictionEngine<CommentInput, CommentPrediction>(loadedModel);
         }
     }
 }
