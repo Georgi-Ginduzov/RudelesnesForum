@@ -63,7 +63,7 @@ namespace Forum.Web.Services
             return postResult.Entity.PostId;
         }
 
-        public async Task<int> AddPostReplyAsync(string creatorId, int postId, string reply)
+        public async Task<(int replyId, bool isFlagged)> AddPostReplyAsync(string creatorId, int postId, string reply)
         {
             var shouldFlag = contentModerationService.IsRudeAsync(reply);
             var replyEntity = new Reply
@@ -79,7 +79,7 @@ namespace Forum.Web.Services
 
             var replyResult = await db.Replies.AddAsync(replyEntity);
             await db.SaveChangesAsync();
-            return replyResult.Entity.Id;
+            return (replyResult.Entity.Id, shouldFlag);
         }
 
         public async Task<int?> DeleteReplyAsync(int replyId)
