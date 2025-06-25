@@ -40,6 +40,9 @@ namespace Forum.Web
                 .AddDefaultTokenProviders()
                 .AddDefaultUI();
 
+            builder.Services
+                .AddScoped<IAnalyticsService, AnalitycsService>();
+            
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
             builder.Services.AddEndpointsApiExplorer();

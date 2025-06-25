@@ -1,23 +1,24 @@
 ﻿using Forum.Web.Models;
+using Forum.Web.Services;
 using Forum.Web.Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.Web.Controllers
 {
-    [Authorize(Roles = "Moderator")]
-    public class ModerationController : Controller
+    [Authorize(Roles = "Admin")]
+    public class AdminController : Controller
     {
-        private readonly IModerationService _moderationService;
+        private readonly IAdministrationService administrationService;
 
-        public ModerationController(IModerationService moderationService)
+        public AdminController(IAdministrationService administrationService)
         {
-            _moderationService = moderationService;
+            this.administrationService = administrationService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var flaggedReplies = await _moderationService.GetFlaggedReplies();
+            /*var flaggedReplies = await administrationService.GetFlaggedReplies();
             var flaggedRepliesViewModel = flaggedReplies.Select(x => new ReplyModerationViewModel
             {
                 CreatedAt = x.CreatedAt,
@@ -27,14 +28,14 @@ namespace Forum.Web.Controllers
                 PostTitle = x.Post.Title,
                 Content = x.Content,
                 Id = x.Id,
-            }).ToList();
-            return View("FlaggedReplies", flaggedRepliesViewModel);
+            }).ToList();*/
+            return View("FlaggedReplies", /*flaggedRepliesViewModel*/ null);
         }
 
         [HttpPost]
         public async Task<IActionResult> Review(int replyId, bool approve)
         {
-            await _moderationService.ReviewReply(replyId, approve);
+            //await administrationService.ReviewReply(replyId, approve);
             return RedirectToAction(nameof(Index));
         }
     }

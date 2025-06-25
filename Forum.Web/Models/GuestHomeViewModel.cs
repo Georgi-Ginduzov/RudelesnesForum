@@ -2,7 +2,7 @@
 {
     public class GuestHomeViewModel
     {
-        public List<PublicDiscussion> RecentDiscussions { get; set; } = new List<PublicDiscussion>();
+        public List<LatestDiscussion> LatestDiscussions { get; set; } = new List<LatestDiscussion>();
         public List<ForumCategory> Categories { get; set; } = new List<ForumCategory>();
         public int TotalPosts { get; set; }
         public int TotalMembers { get; set; }

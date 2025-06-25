@@ -74,10 +74,10 @@
                     <span class="badge bg-light text-dark">Preview</span>
                 </div>
                 <div class="card-body p-0">
-                    @if (Model.RecentDiscussions.Any())
+                    @if (Model.LatestDiscussions.Any())
                     {
                         <div class="list-group list-group-flush">
-                            @foreach (var discussion in Model.RecentDiscussions.Take(5))
+                            @foreach (var discussion in Model.LatestDiscussions.Take(5))
                             {
                                 <div class="list-group-item border-0 py-3">
                                     <div class="row align-items-center">
