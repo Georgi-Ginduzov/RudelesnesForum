@@ -72,7 +72,7 @@ namespace Forum.Web.Services
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
                 IsFlagged = shouldFlag,
-                IsReviewed = false,
+                IsReviewed = !shouldFlag,
                 PostId = postId,
                 UserId = creatorId
             };
