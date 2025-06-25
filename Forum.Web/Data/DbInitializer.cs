@@ -27,7 +27,7 @@ namespace Forum.Web.Data
             var admin = await CreateUserWithRole(userManager, "admin@example.com", "Admin123!", "Admin");
             var moderator = await CreateUserWithRole(userManager, "mod@example.com", "Mod123!", "Moderator");
             var user = await CreateUserWithRole(userManager, "user@example.com", "User123!", "User");
-            var norole = await CreateUserWithRole(userManager, "norole@example.com", "NoRole123!");
+            var user2 = await CreateUserWithRole(userManager, "user2@example.com", "User123!", "User");
 
             // 3. Posts & Replies
             if (!context.Posts.Any())
@@ -40,7 +40,7 @@ namespace Forum.Web.Data
                     Content = "Feel free to introduce yourself and share your interests.",
                     CreatedAt = DateTime.UtcNow.AddDays(-10),
                     LastUpdated = DateTime.UtcNow.AddDays(-5),
-                    UserId = admin.Id,
+                    UserId = user.Id,
                     Replies = new List<Reply>
                     {
                         new Reply
@@ -48,12 +48,18 @@ namespace Forum.Web.Data
                             Content = "Happy to be here!",
                             CreatedAt = DateTime.UtcNow.AddDays(-9),
                             UserId = user.Id,
+                            IsFlagged = true,
+                            IsReviewed = false,
+                            UpdatedAt = DateTime.UtcNow,
                         },
                         new Reply
                         {
                             Content = "Hello everyone!",
                             CreatedAt = DateTime.UtcNow.AddDays(-8),
                             UserId = moderator.Id,
+                            IsReviewed = false,
+                            IsFlagged= false,
+                            UpdatedAt= DateTime.UtcNow,
                         }
                     }
                 },
@@ -71,6 +77,7 @@ namespace Forum.Web.Data
                             Content = "Try using normalized text features!",
                             CreatedAt = DateTime.UtcNow.AddDays(-2),
                             UserId = admin.Id,
+                            UpdatedAt = DateTime.UtcNow,
                             Replies = new List<Reply>
                             {
                                 new Reply

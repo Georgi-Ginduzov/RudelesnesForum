@@ -62,7 +62,7 @@ namespace Forum.Web.Controllers
                     LastUpdated = post.LastUpdated,
                     ReplyCount = post.Replies.Count
                 },
-                Replies = post.Replies.Select(x => new PostReply 
+                Replies = post.Replies.Where(x => user?.Id == x.UserId || !x.IsFlagged && x.IsReviewed).Select(x => new PostReply 
                 {
                     ReplyId = x.Id,
                     Content = x.Content,
