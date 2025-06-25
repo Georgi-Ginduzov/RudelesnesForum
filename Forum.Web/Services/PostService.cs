@@ -8,7 +8,12 @@ namespace Forum.Web.Services
     public class PostService : IPostService
     {
         private readonly ApplicationDbContext db;
-        public PostService(ApplicationDbContext db) => this.db = db;
+        private readonly IContentModerationService contentModerationService;
+        public PostService(ApplicationDbContext db, IContentModerationService contentModerationService)
+        {
+            this.db = db;
+            this.contentModerationService = contentModerationService;
+        }
 
         public async Task<IEnumerable<Post>> GetAllPostsAsync(string search = "", int skip = 0, int take = 0)
         {
@@ -60,13 +65,14 @@ namespace Forum.Web.Services
 
         public async Task<int> AddPostReplyAsync(string creatorId, int postId, string reply)
         {
+            var shouldFlag = contentModerationService.IsRudeAsync(reply);
             var replyEntity = new Reply
             {
                 Content = reply,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                IsFlagged = false,
-                IsReviewed = true,
+                IsFlagged = shouldFlag,
+                IsReviewed = false,
                 PostId = postId,
                 UserId = creatorId
             };
