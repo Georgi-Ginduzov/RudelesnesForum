@@ -47,7 +47,7 @@
             <div class="card bg-light border-0 text-center">
                 <div class="card-body py-3">
                     <div class="h4 text-info mb-1">@Model.OnlineUsers.ToString("N0")</div>
-                    <small class="text-muted">Online Now</small>
+                    <small class="text-muted">This Month's posts</small>
                 </div>
             </div>
         </div>
@@ -84,18 +84,7 @@
                                         <div class="col-md-6">
                                             <div class="d-flex align-items-start">
                                                 <div class="me-3">
-                                                    @if (discussion.IsPinned)
-                                                    {
-                                                        <i class="fas fa-thumbtack text-warning"></i>
-                                                    }
-                                                    else if (discussion.IsLocked)
-                                                    {
-                                                        <i class="fas fa-lock text-muted"></i>
-                                                    }
-                                                    else
-                                                    {
-                                                        <i class="fas fa-comment text-primary"></i>
-                                                    }
+                                                    <i class="fas fa-comment text-primary"></i>
                                                 </div>
                                                 <div>
                                                     <h6 class="mb-1">
@@ -105,7 +94,6 @@
                                                     </h6>
                                                     <small class="text-muted">
                                                         by <strong>@discussion.AuthorName</strong>
-                                                        in <span class="badge bg-secondary">@discussion.Category</span>
                                                     </small>
                                                 </div>
                                             </div>
@@ -155,43 +143,6 @@
                         </a>
                     </div>
                 }
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white border-0">
-                    <h5 class="mb-0">
-                        <i class="fas fa-bolt text-warning me-2"></i>Quick Actions
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-6 col-md-3">
-                            <a href="/Posts/Popular" class="btn btn-outline-danger w-100">
-                                <i class="fas fa-fire me-2"></i>Popular Posts
-                            </a>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <a href="/Posts/Recent" class="btn btn-outline-success w-100">
-                                <i class="fas fa-clock me-2"></i>Recent Posts
-                            </a>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <a href="/Categories" class="btn btn-outline-info w-100">
-                                <i class="fas fa-tags me-2"></i>Categories
-                            </a>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <a href="/Users" class="btn btn-outline-secondary w-100">
-                                <i class="fas fa-users me-2"></i>Members
-                            </a>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
