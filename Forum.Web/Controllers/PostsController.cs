@@ -70,12 +70,20 @@ namespace Forum.Web.Controllers
                     AuthorName = x.User?.UserName ?? string.Empty,
                     AuthorEmail = x.User?.Email ?? string.Empty ,
                     CreatedAt = x.CreatedAt,
-                    LastUpdated = x.UpdatedAt == null ? x.CreatedAt : (DateTime)x.UpdatedAt
+                    LastUpdated = x.UpdatedAt == null ? x.CreatedAt : (DateTime)x.UpdatedAt,
+                    IsReviewed = x.IsReviewed,
+                    IsFlagged = x.IsFlagged,
                 }).ToList(),
                 CanEdit = user!.Id == post.UserId,
                 CanDelete = user.Id == post.UserId,
                 CurrentUserId = user.Id
             };
+            if (TempData.ContainsKey("ReplySubmitted"))
+            {
+                postDetailsModel.ShowSubmissionNotice = true;
+                postDetailsModel.IsSubmissionFlagged = TempData.ContainsKey("ReplyFlagged") && (bool)TempData["ReplyFlagged"];
+            }
+            TempData.Clear();
             return View("Details", postDetailsModel);
         }
 
@@ -96,7 +104,9 @@ namespace Forum.Web.Controllers
         public async Task<IActionResult> PostReply(int postId, string content)
         {
             var user = await _userManager.GetUserAsync(User);
-            await _postService.AddPostReplyAsync(user.Id, postId, content);
+            var (_, isFlagged) = await _postService.AddPostReplyAsync(user.Id, postId, content);
+            TempData["ReplySubmitted"] = true;
+            TempData["ReplyFlagged"] = isFlagged;
             return RedirectToAction("Details", new { id = postId });
         }
 

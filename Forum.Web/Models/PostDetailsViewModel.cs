@@ -10,6 +10,8 @@
         public bool CanDelete { get; set; } = false;
         public bool CanModerate { get; set; } = false;
         public string CurrentUserId { get; set; } = "";
+        public bool ShowSubmissionNotice { get; set; } = false;
+        public bool IsSubmissionFlagged { get; set; } = false;
     }
 
     public class PostDetail
@@ -34,6 +36,10 @@
         public string AuthorEmail { get; set; } = "";
         public DateTime CreatedAt { get; set; }
         public DateTime LastUpdated { get; set; }
+        public bool IsFlagged { get; set; } = false;
+        public bool IsReviewed { get; set; } = false;
+        public bool IsPendingReview => IsFlagged && !IsReviewed;
+        public bool IsEdited => LastUpdated > CreatedAt.AddMinutes(1);
     }
 
     public class PaginationInfo
