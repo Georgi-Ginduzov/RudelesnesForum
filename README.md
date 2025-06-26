@@ -1,4 +1,4 @@
-# Project: Forum with Automatic Moderation of Rude Comments
+# RudelesnesForum
 
 **Student:** \[Your Name]
 **Faculty Number:** \[Your Faculty Number]
@@ -8,205 +8,163 @@
 
 ## Table of Contents
 
-1. [Assignment Description](#assignment-description)
-2. [Solution Overview](#solution-overview)
-3. [Features](#features)
-4. [Technology Stack](#technology-stack)
-5. [Architecture](#architecture)
-6. [Installation](#installation)
-7. [Configuration](#configuration)
-8. [Usage](#usage)
-9. [ML Model Training](#ml-model-training)
-10. [Moderation Workflow](#moderation-workflow)
-11. [Roles & Permissions](#roles--permissions)
-12. [Code Formatting & Documentation](#code-formatting--documentation)
-13. [References](#references)
+1. [Project Overview](#project-overview)
+2. [Features](#features)
+3. [Technology Stack](#technology-stack)
+4. [Repository Structure](#repository-structure)
+5. [Installation & Setup](#installation--setup)
+6. [Configuration](#configuration)
+7. [Running the Application](#running-the-application)
+8. [Machine Learning Model Training](#machine-learning-model-training)
+9. [Moderation Workflow](#moderation-workflow)
+10. [Roles & Permissions](#roles--permissions)
+11. [Code Style & Conventions](#code-style--conventions)
+12. [References](#references)
 
 ---
 
-## Assignment Description
+## Project Overview
 
-This project implements a web-based forum with automatic moderation of rude comments using sentiment analysis. The solution is divided into two key components: a fully functional .NET Core application coded in C#, and comprehensive documentation describing the implementation in detail.
-
-The forum supports three user roles:
-
-* **Users:** Can post comments.
-* **Moderators:** Receive flagged (potentially rude) comments in a dedicated interface and decide to approve or reject.
-* **Administrators:** Manage user accounts (activate/deactivate), assign or revoke moderator rights (but cannot moderate comments).
-
-Every comment is analyzed in real-time by an ML.NET 2.0 sentiment analysis model (NAS‑BERT) pretrained on user-provided comments. Comments deemed rude are flagged for moderator review; others are published automatically.
-
----
-
-## Solution Overview
-
-The application is built on .NET Core and C#. It uses ML.NET 2.0 for sentiment classification with a NAS‑BERT model. The front-end employs Razor pages for UI, with a SQL Server database backend storing users, comments, roles, and moderation status.
-
-Documentation is provided as a separate PDF in Moodle; this README focuses on repository setup, running the application, and understanding core components.
+This solution implements a web-based forum with automatic moderation of rude comments via real-time sentiment analysis. The application is built in C# on .NET Core, with a dedicated folder for ML training scripts. Users post comments that are classified as “Clean” or “Rude,” and potentially rude comments are held for moderator review.
 
 ---
 
 ## Features
 
-* **Real-time Sentiment Analysis:** Each comment is classified as “clean” or “rude.”
-* **Automated Publishing:** Clean comments appear immediately in threads.
-* **Moderator Queue:** Rude comments are queued for manual approval.
-* **Role Management:** Admins can enable/disable users, assign moderator rights.
-* **Scalable ML Model:** Easy retraining and replacement of sentiment model.
+* **Real-time Sentiment Analysis:** Automated classification of every user comment.
+* **Immediate Publishing:** Clean comments appear instantly in the discussion.
+* **Moderator Queue:** Rude or uncertain comments are flagged for manual approval.
+* **Role Management:** Administrators can activate/deactivate accounts and assign moderator rights.
+* **Extensible ML Model:** Training scripts in `Env/ML` allow retraining or swapping the sentiment model.
 
 ---
 
 ## Technology Stack
 
-* **Language & Framework:** C#, .NET Core 6.0 (or later)
-* **ML Library:** ML.NET 2.0
-* **Model Architecture:** NAS‑BERT
-* **Data Storage:** SQL Server (LocalDB or full)
-* **Front-end:** ASP.NET Core Razor Pages
+* **Framework:** .NET Core 6.0+
+* **Language:** C#
+* **Front-end:** ASP.NET Core Razor Pages with SCSS and JavaScript
+* **Database:** SQL Server (LocalDB or full) via Entity Framework Core
+* **ML Scripts:** Python (.ipynb or .py) in `Env/ML`
 
 ---
 
-## Architecture
+## Repository Structure
 
-```plaintext
-[User] ↔ [Razor UI] ↔ [Controller] ↔ [CommentService]
-                             ↕            ↕
-                         [MLModel]    [Repository]
-                             ↕            ↕
-                         [ML.NET]   [SQL Server]
+```
+/Env/ML           Training scripts and environment for sentiment model
+/Forum.Web        ASP.NET Core web application (UI, services, data)
+Forum.sln         Visual Studio solution file
+README.md         Project documentation
+.gitattributes    Git attributes
+.gitignore        Files to ignore in Git
 ```
 
-* **Razor UI:** Page handlers for posting/viewing comments.
-* **CommentService:** Orchestrates ML calls and repository operations.
-* **MLModel:** Loads and predicts sentiment via ML.NET.
-* **Repository:** Entity Framework Core handles data persistence.
+*Key folders and files discovered in this repo.* ([github.com](https://github.com/Georgi-Ginduzov/RudelesnesForum))
 
 ---
 
-## Installation
+## Installation & Setup
 
 1. **Clone the repository:**
 
-   ```bash
-   git clone https://github.com/your-org/forum-moderation.git
-   cd forum-moderation
-   ```
-2. **Restore packages:**
+   ````bash
+   git clone https://github.com/Georgi-Ginduzov/RudelesnesForum.git
+   ``` ([github.com](https://github.com/Georgi-Ginduzov/RudelesnesForum))
+   ````
+2. **Open the solution:** Launch `Forum.sln` in Visual Studio 2022 (or later).
+3. **Restore dependencies:** Visual Studio will prompt to restore NuGet packages; allow it.
+4. **Database preparation:**
 
-   ```bash
-   dotnet restore
-   ```
-3. **Set up database:**
+   * Ensure SQL Server (or LocalDB) is installed and running.
+   * Update the connection string in `Forum.Web/appsettings.json`.
+   * From the **Package Manager Console**, select **Forum.Web** as the Default Project and run:
 
-   * Ensure SQL Server or LocalDB is installed.
-   * Modify `appsettings.json` connection string as needed.
-   * Run migrations:
-
-     ```bash
-     dotnet ef database update
+     ```powershell
+     Update-Database
      ```
 
 ---
 
 ## Configuration
 
-Configure settings in `appsettings.json`:
+Edit `Forum.Web/appsettings.json` to include your database and model paths:
 
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=ForumDb;Trusted_Connection=True;"
+    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=RudeForumDb;Trusted_Connection=True;"
   },
-  "SentimentModelPath": "MLModels/SentimentModel.zip"
+  "SentimentModelPath": "Env/ML/sentiment_model.pkl"
 }
 ```
 
-* **DefaultConnection:** SQL Server connection string.
-* **SentimentModelPath:** Path to the pretrained ML.NET model file.
+* **DefaultConnection:** Connection string for EF Core.
+* **SentimentModelPath:** Path to the trained model file generated by the ML scripts.
 
 ---
 
-## Usage
+## Running the Application
 
-1. **Train or load ML model** (see [ML Model Training](#ml-model-training)).
-2. **Start the application:**
+1. In Visual Studio, set **Forum.Web** as the startup project.
+2. Press **F5** or click **Run** (HTTPS profile).
+3. Navigate to `https://localhost:5001`.
+4. Register a new user, post comments, and observe moderation behavior.
+
+---
+
+## Machine Learning Model Training
+
+Training scripts and notebooks are located in the `Env/ML` folder. ([github.com](https://github.com/Georgi-Ginduzov/RudelesnesForum))
+
+1. **Prepare your Python environment:**
 
    ```bash
-   dotnet run --project src/ForumApp
+   cd Env/ML
+   pip install -r requirements.txt
    ```
-3. **Browse to:** `https://localhost:5001`
-4. **Register** as a User.
-5. **Post comments** in threads—clean comments appear immediately; rude comments go to Moderator Dashboard.
-6. **As Admin,** manage user accounts and assign moderator roles via Admin Panel.
+2. **Label data:** Ensure you have a CSV with `Text,Label` columns.
+3. **Train the model:** Run the training script or notebook:
 
----
-
-## ML Model Training
-
-### Data Preparation
-
-1. Collect and label comments as `Clean` or `Rude`.
-2. Export to a CSV with columns: `Text`, `Label`.
-
-### Training
-
-Use the C# notebook example in `Notebooks/E2E-Text-Classification-API-with-Yelp-Dataset.ipynb` adapted for your data. Or follow:
-
-```csharp
-var pipeline = mlContext.Transforms.Text.FeaturizeText("Features", nameof(CommentData.Text))
-    .Append(mlContext.BinaryClassification.Trainers.SdcaLogisticRegression());
-```
-
-Save the model:
-
-```csharp
-mlContext.Model.Save(model, data.Schema, "MLModels/SentimentModel.zip");
-```
-
-### Loading & Prediction
-
-In `SentimentService.cs`:
-
-```csharp
-_dataView = mlContext.Model.Load(modelPath, out var schema);
-_predictionEngine = mlContext.Model.CreatePredictionEngine<CommentData, CommentPrediction>(_dataView);
-```
+   ```bash
+   python train_sentiment.py
+   ```
+4. **Output:** A model file (e.g. `sentiment_model.pkl`) will be created—referenced by `SentimentModelPath`.
 
 ---
 
 ## Moderation Workflow
 
-1. **User posts** a comment.
-2. **Service analyzes** sentiment.
-3. **If flag = Rude:** comment saved with `Status = Pending`; appears in `Moderation` page.
-4. **Moderator reviews:** clicks Approve or Reject.
-5. **Approved:** status changes to `Approved` and comment becomes visible.
-6. **Rejected:** record removed or status `Rejected`.
+1. **User submits** a comment via the forum UI.
+2. **SentimentService** invokes the ML model; comments classified as “Rude” are marked **Pending**.
+3. **Clean** comments are stored with **Approved** status and displayed immediately.
+4. **Moderators** review pending comments in the **Moderator Dashboard**, choosing Approve or Reject.
+5. **Approved** comments become visible; **Rejected** ones are discarded.
 
 ---
 
 ## Roles & Permissions
 
-| Role          | Permissions                                         |
-| ------------- | --------------------------------------------------- |
-| **User**      | Post comments                                       |
-| **Moderator** | Review pending comments, Approve/Reject             |
-| **Admin**     | Activate/Deactivate users, Assign/Revoke moderators |
+| Role              | Capabilities                                              |
+| ----------------- | --------------------------------------------------------- |
+| **User**          | Register, log in, post comments                           |
+| **Moderator**     | View and moderate pending comments                        |
+| **Administrator** | Manage users (activate/deactivate), assign moderator role |
 
 ---
 
-## Code Formatting & Documentation
+## Code Style & Conventions
 
-* Code follows C# coding conventions and naming guidelines.
-* XML comments used for public methods and classes.
-* Formatting enforced by `.editorconfig` and `dotnet format`.
+* C# code follows Microsoft naming conventions and best practices.
+* Front-end SCSS is organized modularly; JavaScript uses unobtrusive patterns.
+* `.editorconfig` enforces formatting; run `dotnet format` to apply.
 
 ---
 
 ## References
 
-* ML.NET Sentiment Sample: [TextClassification\_Sentiment\_Razor README](https://github.com/dotnet/machinelearning-samples/blob/main/samples/modelbuilder/TextClassification_Sentiment_Razor/README.md)
-* C# E2E Text Classification with Yelp Dataset: [Notebook](https://github.com/dotnet/csharp-notebooks/blob/main/machine-learning/E2E-Text-Classification-API-with-Yelp-Dataset.ipynb)
+* GitHub repository: `https://github.com/Georgi-Ginduzov/RudelesnesForum` ([github.com](https://github.com/Georgi-Ginduzov/RudelesnesForum))
+* ML.NET sentiment sample (for inspiration): [https://github.com/dotnet/machinelearning-samples/tree/main/samples/modelbuilder/TextClassification\_Sentiment\_Razor](https://github.com/dotnet/machinelearning-samples/tree/main/samples/modelbuilder/TextClassification_Sentiment_Razor)
 
 ---
 
