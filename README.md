@@ -1,9 +1,5 @@
 # RudelesnesForum
 
-**Student:** \[Your Name]
-**Faculty Number:** \[Your Faculty Number]
-**Semester:** \[Semester]
-
 ---
 
 ## Table of Contents
