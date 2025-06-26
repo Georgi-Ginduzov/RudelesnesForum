@@ -10,7 +10,7 @@ namespace Forum.Web.Utilities
             var replies = post.Replies;
             var lastReply = replies?.LastOrDefault();
             var authorName = post.User?.UserName ?? post?.User?.Email;
-            var replyCount = replies is null ? 0 : replies.Count;
+            var replyCount = replies is null ? 0 : replies.Count(r => r.IsReviewed == true);
 
 
             return new LatestDiscussion()
@@ -20,7 +20,7 @@ namespace Forum.Web.Utilities
                 AuthorName = authorName!,
                 CreatedAt = post.CreatedAt,
                 ReplyCount = replyCount,
-                LastReplyBy = lastReply?.User.UserName ?? lastReply?.User.Email!,
+                LastReplyBy = lastReply?.User?.UserName ?? lastReply?.User?.Email!,
                 LastReplyAt = lastReply?.CreatedAt,
                 Category = "Category column needs to be added",
                 IsPinned = true,

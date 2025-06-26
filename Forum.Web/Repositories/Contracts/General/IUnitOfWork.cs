@@ -6,8 +6,8 @@ namespace Forum.Web.Repositories.Contracts.Base
         IPostRepository PostRepository { get; }
         //IRudenessReviewRepository RudenessReviewRepository { get; }
         //IRudenessScanRepository RudenessScanRepository { get; }
-        IThreadRepository ThreadRepository { get; }
         IUserRepository UserRepository { get; }
+        IReplyRepository ReplyRepository { get; }
 
         void SaveChanges();
         Task<int> SaveChangesAsync(CancellationToken ct = default);

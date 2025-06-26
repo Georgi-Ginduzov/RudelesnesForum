@@ -25,7 +25,8 @@ namespace Forum.Web
             builder.Services
                 .AddScoped<IPostRepository, PostRepository>()
                 .AddScoped<IThreadRepository, ThreadRepository>()
-                .AddScoped<IUserRepository, UserRepository>();
+                .AddScoped<IUserRepository, UserRepository>()
+                .AddScoped<IReplyRepository, ReplyRepository>();
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 

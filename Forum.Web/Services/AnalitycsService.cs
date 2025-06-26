@@ -5,16 +5,22 @@ using Forum.Web.Services.Contracts;
 using Forum.Web.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Forum.Web.Services
 {
     public class AnalitycsService : IAnalyticsService
     {
         private readonly IUnitOfWork worker;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public AnalitycsService(IUnitOfWork worker) => this.worker = worker;
+        public AnalitycsService(IUnitOfWork worker, UserManager<ApplicationUser> userManager)
+        {
+            this.worker = worker;
+            this.userManager = userManager;
+        }
 
-        public async Task<AdminDashboardViewModel> GetAdminDashboardData(UserManager<ApplicationUser> userManager)
+        public async Task<AdminDashboardViewModel> GetAdminDashboardData()
         {
             try
             {
@@ -42,16 +48,16 @@ namespace Forum.Web.Services
         {
             try
             {
-                var activeUsers = await ActiveUsersCountAsync();
-                var pendingReports = await PendingReportsAsync();
-                var flaggedPosts = await TotalPostsCountAsync();
+                var monthlyPostCount = await PostsForCurrentMonthAsync();
+                var pendingReports = await PendingReportsAsync(userId);
+                var moderators = await GetModeratorsAsync();
                 var resolvedToday = await DailyResolvedFlagsAsync(userId, DateTime.Now);
 
                 return new ModeratorDashboardViewModel
                 {
                     PendingReports = pendingReports,
-                    ActiveWarnings = 4, // What is the diff compared to pending repots
-                    FlaggedPosts = 5, // What is the diff compared to pending repots
+                    Moderators = moderators.Count, 
+                    MonthlyPostCount = monthlyPostCount,
                     ResolvedToday = resolvedToday,
                 };
             }
@@ -69,18 +75,21 @@ namespace Forum.Web.Services
                 var timestamp = DateTime.Now;
                 var startOfDay = new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, 0, 0, 0);
                 var endOfDay = new DateTime(timestamp.Year, timestamp.Month, timestamp.Day, 23, 59, 59);
-
+                var startOfMonth = new DateTime(timestamp.Year, timestamp.Month, 1, 0, 0, 0);
+                var endOfMonth = new DateTime(timestamp.Year, timestamp.Month, DateTime.DaysInMonth(timestamp.Year, timestamp.Month), 23, 59, 59);
+                
                 var totalPosts = await TotalPostsCountAsync();
                 var totalUsers = await TotalUsersAsync();
-                var onlineUsers = await ActiveUsersCountAsync();
+                var currentMonthPosts = await PostsForDateRangeAsync(startOfMonth, endOfMonth);
                 var todaysPosts = await PostsForDateRangeAsync(startOfDay, endOfDay);
+                var pendingApproval = await PostsAwaitingApprovalAsync();
 
                 return new UserHomeViewModel
                 {
                     TotalPosts = totalPosts,
                     TotalUsers = totalUsers,
-                    OnlineUsers = onlineUsers,
-                    TodaysPosts = todaysPosts.Count,
+                    OnlineUsers = currentMonthPosts.Count,
+                    TodaysPosts = pendingApproval,
                     LatestDiscussions = todaysPosts.ToDtos().ToList(),
                 };
             }
@@ -101,7 +110,7 @@ namespace Forum.Web.Services
 
                 var totalPosts = await TotalPostsCountAsync();
                 var totalUsers = await TotalUsersAsync();
-                var onlineUsers = await  ActiveUsersCountAsync();
+                var onlineUsers = await  PostsForCurrentMonthAsync();
                 var todaysPosts = await  PostsForDateRangeAsync(startOfDay, endOfDay);
 
                 return new GuestHomeViewModel()
@@ -121,8 +130,8 @@ namespace Forum.Web.Services
         }
 
         // Admin
-        private async Task<int> ActiveUsersCountAsync()
-            => await worker.UserRepository.Entities.CountAsync(/*u => u.IsActive*/);
+        private async Task<int> PostsForCurrentMonthAsync()
+            => await worker.PostRepository.Entities.CountAsync(p => p.CreatedAt.Month == DateTime.Today.Month && p.CreatedAt.Year == DateTime.Today.Year);
 
         private async ValueTask<int> UsersByRoleCountAsync(string role, UserManager<ApplicationUser> userManager)
         {
@@ -130,25 +139,38 @@ namespace Forum.Web.Services
             return users.Count;
         }
 
-        private async Task<int> PendingReportsAsync()
-            => 5; // need to add the flag entities
+        private async Task<int> PendingReportsAsync(string userId)
+                => await worker.ReplyRepository.Entities
+                            .CountAsync(r => r.IsFlagged && !r.IsReviewed);
 
         private async Task<int> TotalPostsCountAsync()
             => await worker.PostRepository.Entities.CountAsync();
-
+        private async Task<int> TotalFlaggedRepliesCountAsync()
+            => await worker.ReplyRepository.Entities.CountAsync(r => r.IsReviewed);
         private async Task<int> TotalUsersAsync()
             => await worker.UserRepository.Entities.CountAsync();
 
         // Moderator
         private async Task<int> DailyResolvedFlagsAsync(string userId, DateTime date)
-            => 5; // Need flags repo
+        {
+            var from = new DateTime(date.Year, date.Month, date.Day);
+            var to = new DateTime(date.Year, date.Month, date.Day, 23, 59, 59);
+
+            return await worker.ReplyRepository.Entities.CountAsync(r => r.UpdatedAt >= from && r.UpdatedAt <= to && r.IsReviewed);
+        }
 
 
         // User
         private async Task<List<Post>> PostsForDateRangeAsync(DateTime dateFrom, DateTime dateTo)
             => await worker.PostRepository.Entities
-                    .Where(p => p.CreatedAt >= dateFrom || p.CreatedAt <= dateTo)
+                    .Where(p => p.CreatedAt >= dateFrom && p.CreatedAt <= dateTo)
+                    .Include(p => p.User)
+                    .Include(p => p.Replies)
                     .ToListAsync();
+        private async Task<IList<ApplicationUser>> GetModeratorsAsync()
+            => await userManager.GetUsersInRoleAsync("Moderator");
 
+        private async Task<int> PostsAwaitingApprovalAsync()
+            => await worker.ReplyRepository.Entities.CountAsync(r => !r.IsReviewed);
     }
 }

@@ -13,6 +13,6 @@ namespace Forum.Web.Repositories
 
         public void Add(T entity) => db.Set<T>().Add(entity);
         public void Update(T entity) => db.Set<T>().Update(entity);
-        public void Remove(T entity) => db.Set<T>().Remove(entity);
+        public virtual void Remove(T entity) => db.Set<T>().Remove(entity);
     }
 }

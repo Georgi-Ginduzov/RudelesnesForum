@@ -1,6 +1,4 @@
 ﻿using Forum.Web.Data.Entities;
-using Forum.Web.Models;
-using Forum.Web.Services;
 using Forum.Web.Services.Contracts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +20,7 @@ namespace Forum.Web.Controllers
         {
             if (User.IsInRole("Admin"))
             {
-                var model = await service.GetAdminDashboardData(userManager);
+                var model = await service.GetAdminDashboardData();
                 return View("Admin", model);
             }
             else if (User.IsInRole("Moderator"))

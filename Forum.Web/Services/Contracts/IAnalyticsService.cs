@@ -6,7 +6,7 @@ namespace Forum.Web.Services.Contracts
 {
     public interface IAnalyticsService
     {
-        Task<AdminDashboardViewModel> GetAdminDashboardData(UserManager<ApplicationUser> userManager);
+        Task<AdminDashboardViewModel> GetAdminDashboardData();
         Task<GuestHomeViewModel> GetAnonymousUserDashboardData();
         Task<UserHomeViewModel> GetLoggedUserDashboardData();
         Task<ModeratorDashboardViewModel> GetModeratorDashBoardData(string userId);

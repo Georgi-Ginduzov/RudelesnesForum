@@ -8,22 +8,23 @@ namespace Forum.Web.Repositories.Implementations
     {
         private readonly ApplicationDbContext db;
 
-        public UnitOfWork(ApplicationDbContext db, IPostRepository postRepository, IThreadRepository threadRepository, IUserRepository userRepository)
+        public UnitOfWork(ApplicationDbContext db, IPostRepository postRepository, IReplyRepository replyRepository, IUserRepository userRepository)
         {
             this.db = db;
 
             PostRepository = postRepository;
             //RudenessReviewRepository = rudenessReviewRepository;
             //RudenessScanRepository = rudenessScanRepository;
-            ThreadRepository = threadRepository;
+            ReplyRepository = replyRepository;
             UserRepository = userRepository;
         }
 
         public IPostRepository PostRepository { get; }
         //public IRudenessReviewRepository RudenessReviewRepository { get; }
         //public IRudenessScanRepository RudenessScanRepository{ get; }
-        public IThreadRepository ThreadRepository { get; }
+        public IReplyRepository ReplyRepository { get; }
         public IUserRepository UserRepository { get; }
+
 
         public void Dispose() => db?.Dispose();
 
