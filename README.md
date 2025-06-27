@@ -1,6 +1,6 @@
 # RudelesnesForum
 Student: Georgi Ginduzov; Faculty Number: F108470; Semester: spring 2024/2025
-Student: Stivan Kumanov; Faculty Number: F108470; Semester:F108470 spring 2024/2025
+Student: Stivan Kumanov; Faculty Number: FF108786; Semester:F108470 spring 2024/2025
 ---
 
 ## Table of Contents
